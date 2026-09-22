@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 活动筛选指示 Chip（有筛选 / 搜索时展示，关闭即清除）。P4-A，被 fragment_browser 引用。 -->
+<com.google.android.material.chip.Chip xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/filter_chip"
+    style="@style/Widget.R2Manager.Chip"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:visibility="gone"
+    android:text="@string/browser_filter_active"
+    app:chipIcon="@drawable/ic_sliders"
+    app:closeIconVisible="true"
+    app:chipIconTint="@color/primary" />

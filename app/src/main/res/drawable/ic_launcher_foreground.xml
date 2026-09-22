@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 启动图标前景：云 + 锁（品牌橙），108dp 画布含安全区 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- 云轮廓 -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M38,68 h32 a14,14 0 0 0 1.2,-27.9 a20,20 0 0 0 -37,-3.9 A12,12 0 0 0 38,68 z" />
+    <!-- 锁体 -->
+    <path
+        android:fillColor="#FFF6821F"
+        android:pathData="M46,52 h16 a3,3 0 0 1 3,3 v8 a3,3 0 0 1 -3,3 H46 a3,3 0 0 1 -3,-3 v-8 a3,3 0 0 1 3,-3 z" />
+    <!-- 锁梁 -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFF6821F"
+        android:strokeWidth="3"
+        android:pathData="M49,52 v-3.5 a5,5 0 0 1 10,0 V52" />
+</vector>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+      P1 全局单点文件（其他任务包不得修改，需求经 P1 统一落地）。
+      安全基线：
+        · allowBackup=false + 提取规则，禁止凭证/缓存被云备份
+        · usesCleartextTraffic=false + networkSecurityConfig，仅允许 HTTPS
+        · 不声明 READ/WRITE_EXTERNAL_STORAGE（一律走 SAF / Photo Picker，无宽泛存储权限）
+    -->
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+
+    <application
+        android:name=".R2ManagerApp"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.R2Manager"
+        android:usesCleartextTraffic="false"
+        tools:targetApi="34">
+
+        <!--
+          主框架（内部入口）：不对外暴露；仅由 StartupActivity / 解锁页以显式组件启动。
+          singleTop 保证复用实例时走 onNewIntent（如通知点击切传输页）。
+        -->
+        <activity
+            android:name=".ui.main.MainActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.R2Manager"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!--
+          启动检查页（唯一对外入口）：冷启动分流 + 应用锁闸门。
+          硬不变式：应用锁校验（AppLockManager.bootstrap）必须先于任何桶/凭证内容展示。
+        -->
+        <activity
+            android:name=".ui.startup.StartupActivity"
+            android:exported="true"
+            android:theme="@style/Theme.R2Manager">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- 系统分享：承接外部文件上传（R-29），经锁闸门校验后再进入主界面 -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
+
+        <!-- 应用锁解锁页 -->
+        <activity
+            android:name=".ui.lock.LockActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.R2Manager" />
+
+        <!-- 应用锁设置页（首次设置 PIN） -->
+        <activity
+            android:name=".ui.lock.LockSetupActivity"
+            android:exported="false"
+            android:theme="@style/Theme.R2Manager"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- 找回密码页 -->
+        <activity
+            android:name=".ui.lock.ResetPasswordActivity"
+            android:exported="false"
+            android:theme="@style/Theme.R2Manager"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- 预览页 -->
+        <activity
+            android:name=".ui.preview.PreviewActivity"
+            android:exported="false"
+            android:theme="@style/Theme.R2Manager" />
+
+        <!-- 传输前台服务（dataSync）：保活 + 单一进度通知 -->
+        <service
+            android:name=".domain.transfer.TransferService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
+        <!-- 拍照上传缓存文件（FileProvider） -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+    </application>
+
+</manifest>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12+ 数据提取规则：云备份与设备迁移均排除敏感数据。
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="r2_manager_prefs.xml" />
+        <exclude domain="file" path="logs/" />
+        <exclude domain="file" path="cache/" />
+        <exclude domain="database" path="r2_transfer.db" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="r2_manager_prefs.xml" />
+        <exclude domain="file" path="logs/" />
+        <exclude domain="file" path="cache/" />
+        <exclude domain="database" path="r2_transfer.db" />
+    </device-transfer>
+</data-extraction-rules>

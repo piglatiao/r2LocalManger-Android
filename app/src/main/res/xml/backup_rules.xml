@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  云备份排除规则（allowBackup=false 时的防御性配置）。
+  即便系统忽略 allowBackup，也不允许凭证 / 缓存被备份。
+-->
+<full-backup-content>
+    <exclude domain="sharedpref" path="r2_manager_prefs.xml" />
+    <exclude domain="file" path="logs/" />
+    <exclude domain="file" path="cache/" />
+    <exclude domain="database" path="r2_transfer.db" />
+</full-backup-content>

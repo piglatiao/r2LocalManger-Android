@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 文件浏览页。P4-A -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/browser_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/browser_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/surface"
+            app:titleTextAppearance="@style/TextAppearance.R2Manager.AppBarTitle"
+            app:navigationContentDescription="@string/browser_switch_bucket" />
+
+        <LinearLayout
+            android:id="@+id/browser_search_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@color/surface"
+            android:paddingStart="@dimen/space_4"
+            android:paddingEnd="@dimen/space_2"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/browser_search_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:hint="@string/browser_search_hint"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1"
+                android:textColorHint="@color/ink_tertiary" />
+
+            <ImageButton
+                android:id="@+id/browser_search_close"
+                style="@style/Widget.R2Manager.IconButton"
+                android:src="@drawable/ic_close"
+                android:contentDescription="@string/action_close" />
+        </LinearLayout>
+
+        <include layout="@layout/view_breadcrumb" />
+
+        <include layout="@layout/view_filter_chip" />
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/browser_swipe_refresh"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/browser_recycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:paddingBottom="@dimen/space_8"
+                    android:scrollbars="vertical" />
+
+                <com.r2manager.android.ui.widget.StateView
+                    android:id="@+id/browser_state_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </FrameLayout>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/browser_fab_upload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/space_4"
+        android:src="@drawable/ic_plus"
+        android:contentDescription="@string/action_upload"
+        app:backgroundTint="@color/brand"
+        app:tint="@color/on_primary" />
+
+    <LinearLayout
+        android:id="@+id/browser_multiselect_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/appbar_height"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/surface"
+        android:paddingStart="@dimen/space_2"
+        android:paddingEnd="@dimen/space_2"
+        android:visibility="gone">
+
+        <ImageButton
+            android:id="@+id/browser_multiselect_close"
+            style="@style/Widget.R2Manager.IconButton"
+            android:src="@drawable/ic_close"
+            android:contentDescription="@string/action_close" />
+
+        <TextView
+            android:id="@+id/browser_multiselect_count"
+            style="@style/TextAppearance.R2Manager.ListTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/space_2" />
+
+        <ImageButton
+            android:id="@+id/browser_multiselect_select_all"
+            style="@style/Widget.R2Manager.IconButton"
+            android:src="@drawable/ic_check"
+            android:contentDescription="@string/action_select_all" />
+
+        <ImageButton
+            android:id="@+id/browser_multiselect_download"
+            style="@style/Widget.R2Manager.IconButton"
+            android:src="@drawable/ic_down"
+            android:contentDescription="@string/action_download" />
+
+        <ImageButton
+            android:id="@+id/browser_multiselect_share"
+            style="@style/Widget.R2Manager.IconButton"
+            android:src="@drawable/ic_share"
+            android:contentDescription="@string/action_share" />
+
+        <ImageButton
+            android:id="@+id/browser_multiselect_delete"
+            style="@style/Widget.R2Manager.IconButton"
+            android:src="@drawable/ic_trash"
+            android:contentDescription="@string/action_delete" />
+    </LinearLayout>
+</FrameLayout>

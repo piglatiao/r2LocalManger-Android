@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  通用 / 全局文案（P1 独占文件）。
+  仅放跨页面复用的通用文案与通用按钮；页面级文案见 P4 的 strings_*.xml。
+-->
+<resources>
+
+    <string name="app_name">R2 存储管理器</string>
+
+    <!-- ===== 通用按钮 ===== -->
+    <string name="action_confirm">确认</string>
+    <string name="action_cancel">取消</string>
+    <string name="action_save">保存</string>
+    <string name="action_retry">重试</string>
+    <string name="action_delete">删除</string>
+    <string name="action_download">下载</string>
+    <string name="action_upload">上传</string>
+    <string name="action_share">分享</string>
+    <string name="action_copy_link">复制链接</string>
+    <string name="action_open">打开</string>
+    <string name="action_back">返回</string>
+    <string name="action_close">关闭</string>
+    <string name="action_refresh">刷新</string>
+    <string name="action_search">搜索</string>
+    <string name="action_more">更多</string>
+    <string name="action_select_all">全选</string>
+    <string name="action_clear">清空</string>
+    <string name="action_view_logs">查看日志</string>
+
+    <!-- ===== 通用状态 / 提示 ===== -->
+    <string name="state_loading">加载中…</string>
+    <string name="state_empty">这里还没有内容</string>
+    <string name="state_no_result">没有匹配的结果</string>
+    <string name="state_offline">当前处于离线状态</string>
+    <string name="state_error">出错了</string>
+
+    <string name="toast_copied">已复制</string>
+    <string name="toast_saved">已保存</string>
+
+    <!-- ===== 传输通用 ===== -->
+    <string name="transfer_progress_template">正在上传 %1$s… %2$d%% (%3$s/%4$s)</string>
+    <string name="transfer_speed_eta">%1$s · 剩余 %2$s</string>
+
+    <!-- ===== 缩略图跳过提示 ===== -->
+    <string name="thumbnail_skipped_too_large">文件过大，已跳过缩略图</string>
+
+    <!-- ===== 预览相关通用 ===== -->
+    <string name="preview_not_supported">不支持预览此文件类型，请下载后查看</string>
+    <string name="preview_download_to_open">请下载后打开</string>
+
+    <!-- ===== 无障碍描述 ===== -->
+    <string name="cd_up">返回上一级</string>
+    <string name="cd_folder">文件夹</string>
+    <string name="cd_file">文件</string>
+    <string name="cd_upload">上传文件</string>
+
+</resources>

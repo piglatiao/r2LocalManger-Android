@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- PDF 页项。P4-A（被 PdfPageAdapter 渲染）。 -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/space_2">
+
+    <ImageView
+        android:id="@+id/pdf_page_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:background="@color/surface"
+        android:contentDescription="@null" />
+
+    <ProgressBar
+        android:id="@+id/pdf_page_progress"
+        android:layout_width="@dimen/progress_ring_size"
+        android:layout_height="@dimen/progress_ring_size"
+        android:layout_gravity="center"
+        android:indeterminateTint="@color/primary" />
+</FrameLayout>

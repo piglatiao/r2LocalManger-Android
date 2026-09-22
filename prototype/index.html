@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R2 存储管理器 · Android 页面原型</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="logo">R2</span><span>存储管理器 · Android<small>Android 14+ · ConstraintLayout · Material 3</small></span></div>
+  <div class="seg" id="modeseg">
+    <button data-mode="interactive" class="active">交互原型</button>
+    <button data-mode="overview">全部页面</button>
+  </div>
+  <select id="jump"></select>
+  <div class="navbtns"><button id="prev">‹ 上一页</button><button id="next">下一页 ›</button></div>
+</div>
+
+<div class="stage" id="stage">
+  <div class="device"><div class="viewport" id="viewport"></div></div>
+  <aside class="side">
+    <div class="card"><h3><span class="k">页面说明</span><span id="sideTitle">—</span></h3><p id="sideNote">—</p></div>
+    <div class="card"><h3>怎么用</h3><p>页面内的按钮、列表项、Chip、FAB、底部导航都能点。切到「全部页面」可平铺比对，点任意一屏回到交互模式。地址栏加 <b>#overview</b> 或 <b>#preview-image</b> 可直接定位。</p></div>
+    <div class="card"><h3>页面索引</h3><div class="picker" id="picker"></div></div>
+  </aside>
+</div>
+
+<div class="grid-wrap" id="overview"></div>
+<div id="pool" class="hide"></div>
+
+<script src="app.js"></script>
+<script src="screens.js"></script>
+</body>
+</html>

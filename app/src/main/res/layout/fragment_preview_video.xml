@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 视频预览（framework VideoView，不引入 media3）。P4-A -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/preview_bg">
+
+    <VideoView
+        android:id="@+id/preview_video"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/preview_video_play"
+        style="@style/Widget.R2Manager.Button.Brand"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/action_open"
+        android:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/preview_video_progress"
+        android:layout_width="@dimen/progress_ring_size"
+        android:layout_height="@dimen/progress_ring_size"
+        android:layout_gravity="center"
+        android:indeterminateTint="@color/primary" />
+
+    <TextView
+        android:id="@+id/preview_video_message"
+        style="@style/TextAppearance.R2Manager.ListSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:padding="@dimen/space_6"
+        android:visibility="gone" />
+</FrameLayout>

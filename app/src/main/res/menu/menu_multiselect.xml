@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 多选上下文菜单（P1 通用菜单资源） -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_ms_select_all"
+        android:icon="@drawable/ic_check"
+        android:title="@string/action_select_all"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menu_ms_download"
+        android:icon="@drawable/ic_down"
+        android:title="@string/action_download"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menu_ms_share"
+        android:icon="@drawable/ic_share"
+        android:title="@string/action_share"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menu_ms_delete"
+        android:icon="@drawable/ic_trash"
+        android:title="@string/action_delete"
+        app:showAsAction="ifRoom" />
+</menu>

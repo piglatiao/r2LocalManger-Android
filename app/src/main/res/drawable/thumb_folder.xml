@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  P4-C 页面级：文件夹缩略图底（软橙圆角底 + 品牌橙填充文件夹字形）。
+  44dp 基准尺寸，圆角 8dp 与 radius_thumb 对齐；拉伸使用不失真。
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="44dp"
+    android:height="44dp"
+    android:viewportWidth="44"
+    android:viewportHeight="44">
+    <path
+        android:fillColor="#FFF3E6"
+        android:pathData="M8,0 H36 A8,8 0 0 1 44,8 V36 A8,8 0 0 1 36,44 H8 A8,8 0 0 1 0,36 V8 A8,8 0 0 1 8,0 Z" />
+    <group
+        android:scaleX="1.25"
+        android:scaleY="1.25"
+        android:translateX="7.0"
+        android:translateY="7.0">
+        <path
+            android:fillColor="#F6821F"
+            android:pathData="M3.4,8.4 A2.6,2.6 0 0 1 6,5.8 h2.9 l1.9,2.2 h7.2 a2.6,2.6 0 0 1 2.6,2.6 v6.1 a2.6,2.6 0 0 1 -2.6,2.6 H6 a2.6,2.6 0 0 1 -2.6,-2.6 z" />
+    </group>
+</vector>

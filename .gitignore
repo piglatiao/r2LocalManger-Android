@@ -1,0 +1,19 @@
+# 忽略：构建产物、IDE、本地配置
+*.iml
+.gradle
+/build/
+/app/build/
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+.idea/
+.DS_Store
+*.log
+.kotlin/
+.buildlogs/
+
+# CLI 构建用：沙箱规避用的 Gradle 主目录副本（临时，可删）
+.gradle-home/
+/.workbuddy/
+/docs/

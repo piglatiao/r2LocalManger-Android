@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 排序 / 筛选面板。P4-A -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/space_6">
+
+    <View
+        android:layout_width="@dimen/sheet_handle_width"
+        android:layout_height="@dimen/sheet_handle_height"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/space_2"
+        android:background="@drawable/bg_sheet_handle" />
+
+    <TextView
+        android:id="@+id/filter_sort_title"
+        style="@style/TextAppearance.R2Manager.PageTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_4"
+        android:layout_marginTop="@dimen/space_4"
+        android:text="@string/browser_filter_sort_title" />
+
+    <TextView
+        style="@style/TextAppearance.R2Manager.ListSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_4"
+        android:layout_marginTop="@dimen/space_4"
+        android:text="@string/browser_sort_label" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/filter_sort_sort_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_4"
+        android:layout_marginEnd="@dimen/space_4"
+        android:layout_marginTop="@dimen/space_2"
+        app:singleSelection="true"
+        app:selectionRequired="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_sort_name_asc"
+            style="@style/Widget.R2Manager.Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/browser_sort_name_asc" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_sort_name_desc"
+            style="@style/Widget.R2Manager.Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/browser_sort_name_desc" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_sort_time_desc"
+            style="@style/Widget.R2Manager.Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/browser_sort_time_desc" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_sort_time_asc"
+            style="@style/Widget.R2Manager.Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/browser_sort_time_asc" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_sort_size_desc"
+            style="@style/Widget.R2Manager.Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/browser_sort_size_desc" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_sort_size_asc"
+            style="@style/Widget.R2Manager.Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/browser_sort_size_asc" />
+    </com.google.android.material.chip.ChipGroup>
+
+    <TextView
+        style="@style/TextAppearance.R2Manager.ListSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_4"
+        android:layout_marginTop="@dimen/space_4"
+        android:text="@string/browser_filter_label" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/filter_sort_filter_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_4"
+        android:layout_marginEnd="@dimen/space_4"
+        android:layout_marginTop="@dimen/space_2"
+        app:singleSelection="true"
+        app:selectionRequired="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_filter_all"
+            style="@style/Widget.R2Manager.Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/browser_filter_all" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_filter_folder"
+            style="@style/Widget.R2Manager.Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/browser_filter_folder" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_filter_image"
+            style="@style/Widget.R2Manager.Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/browser_filter_image" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_filter_video"
+            style="@style/Widget.R2Manager.Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/browser_filter_video" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_filter_doc"
+            style="@style/Widget.R2Manager.Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/browser_filter_doc" />
+    </com.google.android.material.chip.ChipGroup>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/filter_sort_apply"
+        style="@style/Widget.R2Manager.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_4"
+        android:layout_marginEnd="@dimen/space_4"
+        android:layout_marginTop="@dimen/space_6"
+        android:text="@string/browser_apply" />
+</LinearLayout>

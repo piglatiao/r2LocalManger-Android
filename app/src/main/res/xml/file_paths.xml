@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  FileProvider 暴露路径。
+
+  重要：文件所在目录的 root 类型必须与调用方实际使用的目录**一一对应**，
+  否则 `FileProvider.getUriForFile(...)` 会抛 IllegalArgumentException。
+    · <cache-path> → context.cacheDir
+    · <files-path> → context.filesDir
+-->
+<paths>
+    <!-- 拍照上传输出：BrowserFragment.createCameraOutputUri() → cacheDir/camera/。 -->
+    <cache-path
+        name="camera"
+        path="camera/" />
+
+    <!-- 「打开缓存目录」：CacheSettingsFragment.openCacheDir() → filesDir/cache/（见 CachePaths.root）。 -->
+    <files-path
+        name="cache_root"
+        path="cache/" />
+
+    <!-- 以下两个 root 当前无代码引用（预留），保留声明无副作用；如确认无需可直接删除。 -->
+    <cache-path
+        name="camera_images"
+        path="images/" />
+    <cache-path
+        name="shared_cache"
+        path="shared/" />
+</paths>

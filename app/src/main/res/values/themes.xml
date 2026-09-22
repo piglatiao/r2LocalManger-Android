@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  应用主题（一期仅浅色，docs/03 §5）。P1 独占文件。
+  Material 3 浅色 + 无 ActionBar（各页面自绘 AppBar）。
+-->
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.R2Manager" parent="Theme.Material3.Light.NoActionBar">
+        <!-- 主色板映射 -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorPrimaryContainer">@color/primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/on_primary_container</item>
+        <item name="colorSecondary">@color/brand</item>
+        <item name="colorOnSecondary">@color/on_primary</item>
+        <item name="colorSecondaryContainer">@color/brand_soft</item>
+        <item name="colorOnSecondaryContainer">@color/brand_ink</item>
+        <item name="colorTertiary">@color/blue</item>
+
+        <!-- 表面 / 背景 -->
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorOnBackground">@color/ink_primary</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/ink_primary</item>
+        <item name="colorSurfaceVariant">@color/surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/ink_secondary</item>
+        <item name="colorOutline">@color/outline</item>
+        <item name="colorOutlineVariant">@color/line</item>
+        <item name="colorSurfaceContainerLow">@color/background</item>
+
+        <!-- 语义色 -->
+        <item name="colorError">@color/error</item>
+        <item name="colorOnError">@color/on_primary</item>
+        <item name="colorErrorContainer">@color/red_soft</item>
+        <item name="colorOnErrorContainer">@color/error</item>
+
+        <!-- 系统栏 -->
+        <item name="android:statusBarColor">@color/surface</item>
+        <item name="android:navigationBarColor">@color/surface</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
+        <item name="android:windowBackground">@color/background</item>
+
+        <!-- 弹层样式 -->
+        <item name="bottomSheetDialogTheme">@style/Theme.R2Manager.BottomSheet</item>
+        <item name="materialAlertDialogTheme">@style/Theme.R2Manager.Dialog</item>
+    </style>
+
+    <!-- 底部面板：圆角 16dp、顶部拖拽条 -->
+    <style name="Theme.R2Manager.BottomSheet" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.R2Manager.BottomSheet</item>
+    </style>
+
+    <style name="Widget.R2Manager.BottomSheet" parent="Widget.Material3.BottomSheet.Modal">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.R2Manager.Panel</item>
+        <item name="backgroundTint">@color/surface</item>
+    </style>
+
+    <style name="ShapeAppearance.R2Manager.Panel" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">@dimen/radius_panel</item>
+        <item name="cornerSizeTopRight">@dimen/radius_panel</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
+    <!-- 对话框：圆角 28dp -->
+    <style name="Theme.R2Manager.Dialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.R2Manager.Dialog</item>
+    </style>
+
+    <style name="ShapeAppearance.R2Manager.Dialog" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/radius_dialog</item>
+    </style>
+
+</resources>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 对象网格项（网格模式）。P4-A -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_grid_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="@dimen/space_1"
+    android:background="@drawable/bg_list_item_ripple"
+    android:clickable="true"
+    android:focusable="true">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/thumb_grid_size">
+
+        <ImageView
+            android:id="@+id/grid_thumb"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_thumb_placeholder"
+            android:scaleType="centerCrop"
+            android:contentDescription="@null" />
+
+        <ImageView
+            android:id="@+id/grid_selected"
+            android:layout_width="@dimen/icon_size_small"
+            android:layout_height="@dimen/icon_size_small"
+            android:layout_gravity="top|end"
+            android:layout_margin="@dimen/space_1"
+            android:background="@drawable/shape_check_circle"
+            android:padding="2dp"
+            android:src="@drawable/ic_check"
+            android:visibility="gone"
+            android:contentDescription="@null" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/grid_name"
+        style="@style/TextAppearance.R2Manager.ListSubtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_1"
+        android:gravity="center"
+        android:maxLines="1"
+        android:ellipsize="end" />
+</LinearLayout>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 通用：缩略图占位底（8dp 圆角，浅描边） -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/surface_variant" />
+    <stroke
+        android:width="@dimen/stroke_thin"
+        android:color="@color/outline" />
+    <corners android:radius="@dimen/radius_thumb" />
+</shape>

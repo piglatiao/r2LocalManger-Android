@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  设计 token（唯一来源）。转写自 prototype/app.css 与 docs/03 §1；
+  命名与取值对齐 docs/05 §8.7。P1 独占文件（只增不改名），全队复用。
+-->
+<resources>
+
+    <!-- ===== 主色 / 容器（docs/03 §1.1） ===== -->
+    <color name="primary">#2B5CE6</color>
+    <color name="primary_container">#E7EDFD</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="on_primary_container">#14181F</color>
+
+    <!-- 品牌橙：仅用于上传 / 进行中状态，克制使用 -->
+    <color name="brand">#F6821F</color>
+    <color name="brand_soft">#FFF3E6</color>
+    <color name="brand_2">#E06E0A</color>
+    <color name="brand_ink">#8A4400</color>
+
+    <!-- ===== 表面 / 背景 / 描边 ===== -->
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#F4F6F9</color>
+    <color name="background">#F4F6F9</color>
+    <color name="outline">#E2E6EC</color>
+    <color name="canvas">#F6F7F9</color>
+    <color name="card">#FFFFFF</color>
+    <color name="line">#E9EBEF</color>
+    <color name="line_2">#F2F4F7</color>
+
+    <!-- ===== 文字 ===== -->
+    <color name="ink_primary">#14181F</color>
+    <color name="ink_secondary">#5B6472</color>
+    <color name="ink_tertiary">#8A939F</color>
+    <color name="ink_4">#C2CAD6</color>
+
+    <!-- ===== 语义色 ===== -->
+    <color name="success">#16A34A</color>
+    <color name="warning">#D97706</color>
+    <color name="error">#DC2626</color>
+    <color name="red_soft">#FDECEC</color>
+    <color name="blue">#2F6FED</color>
+    <color name="blue_soft">#EAF1FE</color>
+    <color name="green">#12905F</color>
+    <color name="green_soft">#E7F6EF</color>
+    <color name="purple">#7C5CFC</color>
+
+    <!-- ===== 局部专用 ===== -->
+    <color name="preview_bg">#0B0D12</color>
+    <color name="folder_thumb">#FFF3E6</color>
+
+    <!-- ===== 基础 ===== -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+
+    <!-- ===== 遮罩 / 分隔（半透明） ===== -->
+    <color name="scrim">#66000000</color>
+    <color name="divider">#E2E6EC</color>
+
+</resources>

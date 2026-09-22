@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  错误文案（ErrorMapper 唯一引用源，P1 独占文件）。
+  逐字取自桌面版 i18n/zh-CN.js 的 UI_TEXT（见 docs/02 §7 / docs/05 §8.3）。
+  注意：请保持与 i18n 完全一致，含全角引号 “ ”。
+-->
+<resources>
+
+    <!-- ===== 七类（+2）错误主文案 ===== -->
+    <string name="error_network">网络连接失败，请检查网络设置</string>
+    <string name="error_auth">认证失败，请检查 API 凭证配置</string>
+    <string name="error_auth_detail">请先在“设置 &gt; 凭证配置”中填写 R2 凭证，并在“存储桶设置”中确认连接参数</string>
+    <string name="error_bucket">存储桶不存在或无法访问</string>
+    <string name="error_object">对象不存在，可能已被删除</string>
+    <string name="error_permission">权限不足，无法执行此操作</string>
+    <string name="error_file_not_found">文件或目录不存在</string>
+    <string name="error_file_access">没有访问权限</string>
+    <string name="error_disk_space">磁盘空间不足</string>
+    <string name="error_unknown">发生未知错误，请查看日志文件获取详细信息</string>
+
+    <!-- ===== Android 平台特有分支 ===== -->
+    <string name="error_no_connection">无网络连接，请检查 Wi-Fi 或移动数据</string>
+    <string name="error_saf_permission">存储权限缺失，需重新选择目录</string>
+
+    <!-- ===== 启动检查三套文案（逐字取自 i18n） ===== -->
+    <string name="startup_check_missing_credentials">启动检查发现未配置凭证，请先完成配置。</string>
+    <string name="startup_check_invalid_settings">启动检查发现 R2 配置无效，请检查 S3 地址、区域、桶名等设置。</string>
+    <string name="startup_check_connection_failed">启动检查失败：无法连接到 R2，请检查连接或配置。</string>
+
+    <!-- ===== 日志位置提示模板 ===== -->
+    <string name="error_log_path">日志位置: %1$s</string>
+
+</resources>

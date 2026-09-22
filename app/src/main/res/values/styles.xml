@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  文本角色与通用控件样式（docs/03 §1.2）。P1 独占文件。
+  字号用 sp、行高用 sp（可变），保证系统字体放大到 200% 不破版（R-49）。
+-->
+<resources>
+
+    <!-- ================= 文本角色 ================= -->
+
+    <style name="TextAppearance.R2Manager.PageTitle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textSize">@dimen/text_page_title</item>
+        <item name="android:lineSpacingExtra">@dimen/line_page_title</item>
+        <item name="android:textColor">@color/ink_primary</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="TextAppearance.R2Manager.AppBarTitle" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textSize">@dimen/text_appbar_title</item>
+        <item name="android:lineSpacingExtra">@dimen/line_appbar_title</item>
+        <item name="android:textColor">@color/ink_primary</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextAppearance.R2Manager.ListTitle" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textSize">@dimen/text_list_title</item>
+        <item name="android:lineSpacingExtra">@dimen/line_list_title</item>
+        <item name="android:textColor">@color/ink_primary</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="TextAppearance.R2Manager.ListSubtitle" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textSize">@dimen/text_list_subtitle</item>
+        <item name="android:lineSpacingExtra">@dimen/line_list_subtitle</item>
+        <item name="android:textColor">@color/ink_secondary</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="TextAppearance.R2Manager.Button" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:textSize">@dimen/text_button</item>
+        <item name="android:lineSpacingExtra">@dimen/line_button</item>
+        <item name="android:textColor">@color/on_primary</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.R2Manager.Caption" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textSize">@dimen/text_caption</item>
+        <item name="android:lineSpacingExtra">@dimen/line_caption</item>
+        <item name="android:textColor">@color/ink_tertiary</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <!-- ================= 按钮 ================= -->
+
+    <style name="Widget.R2Manager.Button" parent="Widget.Material3.Button">
+        <item name="android:textAppearance">@style/TextAppearance.R2Manager.Button</item>
+        <item name="android:minHeight">@dimen/touch_target_min</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <style name="Widget.R2Manager.Button.Primary" parent="Widget.R2Manager.Button">
+        <item name="backgroundTint">@color/primary</item>
+        <item name="android:textColor">@color/on_primary</item>
+    </style>
+
+    <style name="Widget.R2Manager.Button.Brand" parent="Widget.R2Manager.Button">
+        <item name="backgroundTint">@color/brand</item>
+        <item name="android:textColor">@color/on_primary</item>
+    </style>
+
+    <style name="Widget.R2Manager.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textAppearance">@style/TextAppearance.R2Manager.Button</item>
+        <item name="android:textColor">@color/primary</item>
+        <item name="strokeColor">@color/outline</item>
+        <item name="android:minHeight">@dimen/touch_target_min</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Widget.R2Manager.Button.Text" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textAppearance">@style/TextAppearance.R2Manager.Button</item>
+        <item name="android:textColor">@color/primary</item>
+        <item name="android:minHeight">@dimen/touch_target_min</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Widget.R2Manager.Button.Danger" parent="Widget.R2Manager.Button">
+        <item name="backgroundTint">@color/error</item>
+        <item name="android:textColor">@color/on_primary</item>
+    </style>
+
+    <!-- ================= Chip / Card / 分割线 ================= -->
+
+    <style name="Widget.R2Manager.Chip" parent="Widget.Material3.Chip.Assist">
+        <item name="chipBackgroundColor">@color/primary_container</item>
+        <item name="android:textColor">@color/ink_primary</item>
+        <item name="chipStrokeWidth">0dp</item>
+        <item name="chipMinHeight">32dp</item>
+    </style>
+
+    <style name="Widget.R2Manager.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardBackgroundColor">@color/surface</item>
+        <item name="cardCornerRadius">@dimen/radius_card</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeColor">@color/outline</item>
+        <item name="strokeWidth">@dimen/stroke_thin</item>
+    </style>
+
+    <style name="Widget.R2Manager.Divider" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/divider_height</item>
+        <item name="android:background">@color/outline</item>
+    </style>
+
+    <!-- ================= 进度条 ================= -->
+
+    <style name="Widget.R2Manager.ProgressBar.Horizontal" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:layout_height">@dimen/progress_bar_height</item>
+        <item name="android:progressDrawable">@drawable/shape_progress_horizontal</item>
+    </style>
+
+    <!-- ================= 列表项根 ================= -->
+
+    <style name="Widget.R2Manager.ListItem" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">@dimen/list_row_height_double</item>
+        <item name="android:background">@drawable/bg_list_item_ripple</item>
+        <item name="android:paddingStart">@dimen/list_item_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/list_item_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/list_item_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/list_item_padding_vertical</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <!-- ================= 图标按钮 ================= -->
+
+    <style name="Widget.R2Manager.IconButton" parent="">
+        <item name="android:layout_width">@dimen/touch_target_min</item>
+        <item name="android:layout_height">@dimen/touch_target_min</item>
+        <item name="android:padding">@dimen/space_3</item>
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:tint">@color/ink_primary</item>
+    </style>
+
+</resources>

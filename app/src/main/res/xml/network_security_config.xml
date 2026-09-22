@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  仅允许 HTTPS（docs/05 §7.2）。禁止任何明文流量，含系统信任与用户证书域。
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- 显式拒绝明文（防御性，与 base-config 一致） -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">r2.cloudflarestorage.com</domain>
+        <domain includeSubdomains="true">cloudflare.com</domain>
+    </domain-config>
+</network-security-config>

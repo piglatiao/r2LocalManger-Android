@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 对象列表行（列表模式）。P4-A -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_root"
+    style="@style/Widget.R2Manager.ListItem"
+    android:orientation="horizontal">
+
+    <FrameLayout
+        android:layout_width="@dimen/thumb_list_size"
+        android:layout_height="@dimen/thumb_list_size">
+
+        <ImageView
+            android:id="@+id/item_thumb"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_thumb_placeholder"
+            android:scaleType="centerCrop"
+            android:contentDescription="@null" />
+
+        <ImageView
+            android:id="@+id/item_selected"
+            android:layout_width="@dimen/icon_size_small"
+            android:layout_height="@dimen/icon_size_small"
+            android:layout_gravity="top|end"
+            android:background="@drawable/shape_check_circle"
+            android:padding="2dp"
+            android:src="@drawable/ic_check"
+            android:visibility="gone"
+            android:contentDescription="@null" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="@dimen/space_3"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/item_name"
+            style="@style/TextAppearance.R2Manager.ListTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/item_meta"
+            style="@style/TextAppearance.R2Manager.ListSubtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/item_more"
+        style="@style/Widget.R2Manager.IconButton"
+        android:src="@drawable/ic_more"
+        android:contentDescription="@string/action_more" />
+</LinearLayout>

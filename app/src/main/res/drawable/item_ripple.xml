@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  P4-C 页面级通用：可点击项水波纹（12dp 圆角遮罩，无底色）。
+  供 item_object / view_transfer_progress_card / view_pin_pad 等复用。
+-->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/line">
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/ink_4" />
+            <corners android:radius="@dimen/radius_card" />
+        </shape>
+    </item>
+</ripple>

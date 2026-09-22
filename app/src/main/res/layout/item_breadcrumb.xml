@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 面包屑节点。P4-A -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="@dimen/breadcrumb_height"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/crumb_separator"
+        style="@style/TextAppearance.R2Manager.ListSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/space_1"
+        android:paddingEnd="@dimen/space_1"
+        android:text="/"
+        android:textColor="@color/ink_4" />
+
+    <TextView
+        android:id="@+id/crumb_label"
+        style="@style/TextAppearance.R2Manager.ListSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/item_ripple"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:paddingStart="@dimen/space_2"
+        android:paddingEnd="@dimen/space_2"
+        android:minHeight="@dimen/breadcrumb_height" />
+</LinearLayout>

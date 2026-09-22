@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 其它类型预览（信息卡 + 下载后打开）。P4-A -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/page_margin">
+
+        <TextView
+            android:id="@+id/preview_detail_title"
+            style="@style/TextAppearance.R2Manager.PageTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/preview_detail_title" />
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.R2Manager.Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_4">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/space_4">
+
+                <TextView
+                    style="@style/TextAppearance.R2Manager.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/preview_label_name" />
+
+                <TextView
+                    android:id="@+id/preview_other_name"
+                    style="@style/TextAppearance.R2Manager.ListTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/space_3" />
+
+                <TextView
+                    style="@style/TextAppearance.R2Manager.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/preview_label_size" />
+
+                <TextView
+                    android:id="@+id/preview_other_size"
+                    style="@style/TextAppearance.R2Manager.ListTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/space_3" />
+
+                <TextView
+                    style="@style/TextAppearance.R2Manager.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/preview_label_type" />
+
+                <TextView
+                    android:id="@+id/preview_other_type"
+                    style="@style/TextAppearance.R2Manager.ListTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/space_3" />
+
+                <TextView
+                    style="@style/TextAppearance.R2Manager.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/preview_label_time" />
+
+                <TextView
+                    android:id="@+id/preview_other_time"
+                    style="@style/TextAppearance.R2Manager.ListTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/space_3" />
+
+                <TextView
+                    style="@style/TextAppearance.R2Manager.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/preview_label_url" />
+
+                <TextView
+                    android:id="@+id/preview_other_url"
+                    style="@style/TextAppearance.R2Manager.ListSubtitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textIsSelectable="true" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/preview_other_copy"
+            style="@style/Widget.R2Manager.Button.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_4"
+            android:text="@string/action_copy_link" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/preview_other_download"
+            style="@style/Widget.R2Manager.Button.Brand"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_3"
+            android:text="@string/preview_download_to_open" />
+
+        <TextView
+            android:id="@+id/preview_other_message"
+            style="@style/TextAppearance.R2Manager.ListSubtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_4"
+            android:gravity="center"
+            android:visibility="gone" />
+    </LinearLayout>
+</ScrollView>

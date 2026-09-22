@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 面包屑条（水平滚动）。P4-A，被 fragment_browser 引用。 -->
+<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/browser_breadcrumb"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/breadcrumb_height"
+    android:clipToPadding="false"
+    android:paddingStart="@dimen/space_2"
+    android:paddingEnd="@dimen/space_2"
+    android:scrollbars="none" />

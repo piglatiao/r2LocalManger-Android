@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  P4-C 页面级：预览占位图（图片类占位 / 加载失败占位）。
+  描边取 inkTertiary，兼顾深色预览底与浅色列表底。
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#8A939F"
+        android:strokeWidth="1.4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M6,5 h12 a2.4,2.4 0 0 1 2.4,2.4 v9.2 a2.4,2.4 0 0 1 -2.4,2.4 H6 a2.4,2.4 0 0 1 -2.4,-2.4 V7.4 A2.4,2.4 0 0 1 6,5 z M7.1,10.2 a1.7,1.7 0 1,0 3.4,0 a1.7,1.7 0 1,0 -3.4,0 M4.4,17.4 L9.8,12 l2.8,2.8 2.6,-2.4 4.4,4.2" />
+</vector>

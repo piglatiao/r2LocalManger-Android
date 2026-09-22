@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 文本预览。P4-A -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/surface">
+
+    <ScrollView
+        android:id="@+id/preview_text_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/space_4"
+        android:fillViewport="true">
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="horizontal">
+
+            <TextView
+                android:id="@+id/preview_text_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:textSize="@dimen/text_preview_mono"
+                android:textColor="@color/ink_primary"
+                android:textIsSelectable="true" />
+        </HorizontalScrollView>
+    </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/preview_text_progress"
+        android:layout_width="@dimen/progress_ring_size"
+        android:layout_height="@dimen/progress_ring_size"
+        android:layout_gravity="center"
+        android:indeterminateTint="@color/primary" />
+
+    <TextView
+        android:id="@+id/preview_text_message"
+        style="@style/TextAppearance.R2Manager.ListSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:padding="@dimen/space_6"
+        android:visibility="gone" />
+</FrameLayout>

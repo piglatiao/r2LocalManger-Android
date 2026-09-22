@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 通用：Chip 底（主色容器，全圆角） -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/primary_container" />
+    <corners android:radius="@dimen/radius_chip" />
+</shape>

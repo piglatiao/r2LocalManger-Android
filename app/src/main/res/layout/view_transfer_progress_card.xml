@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  P4-C 公共：传输进度卡片（悬浮于浏览页底部，对应 prototype .progcard）。
+  数据由 TransferProgressCardView 订阅 P3 TransferProgressBus 后绑定。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tp_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_card"
+    android:padding="@dimen/space_4"
+    android:elevation="6dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/tp_direction_icon"
+            android:layout_width="@dimen/icon_size_tiny"
+            android:layout_height="@dimen/icon_size_tiny"
+            android:src="@drawable/ic_up"
+            android:contentDescription="@null"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:id="@+id/tp_title"
+            style="@style/TextAppearance.R2Manager.ListTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/space_2"
+            android:maxLines="1"
+            android:ellipsize="end"
+            tools:text="IMG_0143.jpg" />
+
+        <TextView
+            android:id="@+id/tp_tag"
+            style="@style/TextAppearance.R2Manager.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_2"
+            android:background="@drawable/bg_chip"
+            android:paddingStart="@dimen/space_2"
+            android:paddingEnd="@dimen/space_2"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:textColor="@color/primary"
+            tools:text="42%" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/tp_progress"
+        style="@style/Widget.R2Manager.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/progress_bar_height"
+        android:layout_marginTop="@dimen/space_3"
+        android:max="100"
+        android:progress="0"
+        tools:progress="42" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_2"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tp_bytes"
+            style="@style/TextAppearance.R2Manager.Caption"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            tools:text="42% · 10.3 / 24.6 MB" />
+
+        <TextView
+            android:id="@+id/tp_speed"
+            style="@style/TextAppearance.R2Manager.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="2.4 MB/s · 剩余 18 秒" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/tp_actions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_3"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tp_action_primary"
+            style="@style/Widget.R2Manager.Button.Text"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            tools:text="查看全部任务" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tp_action_danger"
+            style="@style/Widget.R2Manager.Button.Danger"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginStart="@dimen/space_2"
+            android:visibility="gone"
+            tools:text="取消"
+            tools:visibility="visible" />
+    </LinearLayout>
+</LinearLayout>

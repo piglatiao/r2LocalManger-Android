@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 启动页：冷启动分流（检查中 / 错误五态）。P4-A -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/startup_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@color/background">
+
+    <TextView
+        android:id="@+id/startup_title"
+        style="@style/TextAppearance.R2Manager.PageTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_8"
+        android:text="@string/app_name" />
+
+    <com.r2manager.android.ui.widget.StateView
+        android:id="@+id/state_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+</LinearLayout>

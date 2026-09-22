@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 通用：错误提示横幅底 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/red_soft" />
+    <corners android:radius="@dimen/radius_card" />
+</shape>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  主导航图（文件 / 传输 / 设置 + 设置二级页）。P4-A 独占文件。
+  说明：顶部三页由 MainActivity 的 ViewPager2 + MainPagerAdapter 承载；
+  本图用于设置二级页的声明式导航（P4-B 在 SettingsFragment 内以 NavHost 承载即可复用本图）。
+-->
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_main"
+    app:startDestination="@id/browserFragment">
+
+    <!-- ===== 顶级三页 ===== -->
+    <fragment
+        android:id="@+id/browserFragment"
+        android:name="com.r2manager.android.ui.browser.BrowserFragment"
+        android:label="@string/nav_files"
+        tools:layout="@layout/fragment_browser" />
+
+    <fragment
+        android:id="@+id/transferFragment"
+        android:name="com.r2manager.android.ui.transfer.TransferFragment"
+        android:label="@string/nav_transfer" />
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.r2manager.android.ui.settings.SettingsFragment"
+        android:label="@string/nav_settings">
+
+        <action
+            android:id="@+id/action_settings_to_credentials"
+            app:destination="@id/credentialsFragment" />
+        <action
+            android:id="@+id/action_settings_to_bucket"
+            app:destination="@id/bucketSettingsFragment" />
+        <action
+            android:id="@+id/action_settings_to_cache"
+            app:destination="@id/cacheSettingsFragment" />
+        <action
+            android:id="@+id/action_settings_to_security"
+            app:destination="@id/securitySettingsFragment" />
+        <action
+            android:id="@+id/action_settings_to_advanced"
+            app:destination="@id/advancedSettingsFragment" />
+        <action
+            android:id="@+id/action_settings_to_logs"
+            app:destination="@id/logsFragment" />
+    </fragment>
+
+    <!-- ===== 设置二级页 ===== -->
+    <fragment
+        android:id="@+id/credentialsFragment"
+        android:name="com.r2manager.android.ui.settings.CredentialsFragment"
+        android:label="@string/nav_settings" />
+
+    <fragment
+        android:id="@+id/bucketSettingsFragment"
+        android:name="com.r2manager.android.ui.settings.BucketSettingsFragment"
+        android:label="@string/nav_settings" />
+
+    <fragment
+        android:id="@+id/cacheSettingsFragment"
+        android:name="com.r2manager.android.ui.settings.CacheSettingsFragment"
+        android:label="@string/nav_settings" />
+
+    <fragment
+        android:id="@+id/securitySettingsFragment"
+        android:name="com.r2manager.android.ui.settings.SecuritySettingsFragment"
+        android:label="@string/nav_settings" />
+
+    <fragment
+        android:id="@+id/advancedSettingsFragment"
+        android:name="com.r2manager.android.ui.settings.AdvancedSettingsFragment"
+        android:label="@string/nav_settings" />
+
+    <fragment
+        android:id="@+id/logsFragment"
+        android:name="com.r2manager.android.ui.settings.LogsFragment"
+        android:label="@string/nav_settings" />
+
+</navigation>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  尺寸 token（docs/03 §1.3 / docs/05 §8.7）：基准 8dp；可用值 4/8/12/16/24/32。
+  P1 独占文件。
+-->
+<resources>
+
+    <!-- ===== 8dp 网格 ===== -->
+    <dimen name="space_1">4dp</dimen>
+    <dimen name="space_2">8dp</dimen>
+    <dimen name="space_3">12dp</dimen>
+    <dimen name="space_4">16dp</dimen>
+    <dimen name="space_6">24dp</dimen>
+    <dimen name="space_8">32dp</dimen>
+
+    <!-- ===== 页面边距 / 内边距 ===== -->
+    <dimen name="page_margin">16dp</dimen>
+    <dimen name="list_item_padding_horizontal">16dp</dimen>
+    <dimen name="list_item_padding_vertical">12dp</dimen>
+
+    <!-- ===== 触控 / 结构高度 ===== -->
+    <dimen name="touch_target_min">48dp</dimen>
+    <dimen name="appbar_height">56dp</dimen>
+    <dimen name="bottom_nav_height">56dp</dimen>
+    <dimen name="breadcrumb_height">40dp</dimen>
+    <dimen name="chip_row_height">40dp</dimen>
+    <dimen name="list_row_height_single">64dp</dimen>
+    <dimen name="list_row_height_double">72dp</dimen>
+
+    <!-- ===== 缩略图 ===== -->
+    <dimen name="thumb_list_size">44dp</dimen>
+    <dimen name="thumb_grid_size">104dp</dimen>
+
+    <!-- ===== 圆角 ===== -->
+    <dimen name="radius_card">12dp</dimen>
+    <dimen name="radius_panel">16dp</dimen>
+    <dimen name="radius_dialog">28dp</dimen>
+    <dimen name="radius_thumb">8dp</dimen>
+    <dimen name="radius_chip">999dp</dimen>
+    <dimen name="radius_button">999dp</dimen>
+
+    <!-- ===== 图标 ===== -->
+    <dimen name="icon_size">24dp</dimen>
+    <dimen name="icon_size_small">20dp</dimen>
+    <dimen name="icon_size_tiny">16dp</dimen>
+
+    <!-- ===== 描边 / 分割 ===== -->
+    <dimen name="stroke_thin">1dp</dimen>
+    <dimen name="divider_height">1dp</dimen>
+
+    <!-- ===== 进度条 ===== -->
+    <dimen name="progress_bar_height">4dp</dimen>
+    <dimen name="progress_ring_size">20dp</dimen>
+
+    <!-- ===== 字号（sp） ===== -->
+    <dimen name="text_page_title">20sp</dimen>
+    <dimen name="text_appbar_title">18sp</dimen>
+    <dimen name="text_list_title">15sp</dimen>
+    <dimen name="text_list_subtitle">12sp</dimen>
+    <dimen name="text_button">14sp</dimen>
+    <dimen name="text_caption">12sp</dimen>
+    <dimen name="text_preview_mono">13sp</dimen>
+
+    <!-- ===== 行高（sp，随系统字体缩放；禁止固定行高以支持 200% 字号） ===== -->
+    <dimen name="line_page_title">26sp</dimen>
+    <dimen name="line_appbar_title">24sp</dimen>
+    <dimen name="line_list_title">20sp</dimen>
+    <dimen name="line_list_subtitle">16sp</dimen>
+    <dimen name="line_button">20sp</dimen>
+    <dimen name="line_caption">16sp</dimen>
+
+    <!-- ===== 其它 ===== -->
+    <dimen name="sheet_handle_width">40dp</dimen>
+    <dimen name="sheet_handle_height">4dp</dimen>
+    <dimen name="dialog_button_min_width">72dp</dimen>
+
+</resources>

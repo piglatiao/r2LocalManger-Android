@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- PDF 预览（逐页渲染）。P4-A -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/surface_variant">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/preview_pdf_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingTop="@dimen/space_2"
+        android:paddingBottom="@dimen/space_2" />
+
+    <ProgressBar
+        android:id="@+id/preview_pdf_progress"
+        android:layout_width="@dimen/progress_ring_size"
+        android:layout_height="@dimen/progress_ring_size"
+        android:layout_gravity="center"
+        android:indeterminateTint="@color/primary" />
+
+    <TextView
+        android:id="@+id/preview_pdf_message"
+        style="@style/TextAppearance.R2Manager.ListSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:padding="@dimen/space_6"
+        android:visibility="gone" />
+</FrameLayout>

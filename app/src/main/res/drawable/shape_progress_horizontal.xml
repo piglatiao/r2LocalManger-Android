@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 通用：水平进度条 drawable（进度=primary，底=outline） -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/outline" />
+            <corners android:radius="2dp" />
+        </shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape android:shape="rectangle">
+                <solid android:color="@color/primary" />
+                <corners android:radius="2dp" />
+            </shape>
+        </clip>
+    </item>
+</layer-list>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 复制链接面板。P4-A -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/space_6">
+
+    <View
+        android:layout_width="@dimen/sheet_handle_width"
+        android:layout_height="@dimen/sheet_handle_height"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/space_2"
+        android:background="@drawable/bg_sheet_handle" />
+
+    <TextView
+        android:id="@+id/copy_url_title"
+        style="@style/TextAppearance.R2Manager.PageTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_4"
+        android:layout_marginTop="@dimen/space_4"
+        android:text="@string/browser_copy_url_title" />
+
+    <TextView
+        android:id="@+id/copy_url_name"
+        style="@style/TextAppearance.R2Manager.ListTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_4"
+        android:layout_marginEnd="@dimen/space_4"
+        android:layout_marginTop="@dimen/space_2"
+        android:maxLines="1"
+        android:ellipsize="middle" />
+
+    <TextView
+        android:id="@+id/copy_url_value"
+        style="@style/TextAppearance.R2Manager.ListSubtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_4"
+        android:layout_marginEnd="@dimen/space_4"
+        android:layout_marginTop="@dimen/space_3"
+        android:background="@drawable/bg_card"
+        android:padding="@dimen/space_3"
+        android:textIsSelectable="true" />
+
+    <TextView
+        style="@style/TextAppearance.R2Manager.ListSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_4"
+        android:layout_marginTop="@dimen/space_4"
+        android:text="@string/browser_copy_url_format" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/copy_url_format_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_4"
+        android:layout_marginEnd="@dimen/space_4"
+        android:layout_marginTop="@dimen/space_2"
+        app:singleSelection="true"
+        app:selectionRequired="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_format_url"
+            style="@style/Widget.R2Manager.Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/browser_copy_format_url" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_format_html"
+            style="@style/Widget.R2Manager.Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/browser_copy_format_html" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_format_markdown"
+            style="@style/Widget.R2Manager.Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/browser_copy_format_markdown" />
+    </com.google.android.material.chip.ChipGroup>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/copy_url_copy"
+        style="@style/Widget.R2Manager.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_4"
+        android:layout_marginEnd="@dimen/space_4"
+        android:layout_marginTop="@dimen/space_6"
+        android:text="@string/browser_copy" />
+</LinearLayout>

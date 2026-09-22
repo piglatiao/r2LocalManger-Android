@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 整型 token。P1 独占文件。 -->
+<resources>
+    <!-- 网格列数 -->
+    <integer name="grid_span_portrait">3</integer>
+    <integer name="grid_span_landscape">5</integer>
+
+    <!-- 动画时长（毫秒） -->
+    <integer name="anim_duration_short">150</integer>
+    <integer name="anim_duration">220</integer>
+    <integer name="preview_toolbar_auto_hide">3000</integer>
+
+    <!-- 列表触底加载提前量 -->
+    <integer name="load_more_threshold">5</integer>
+
+    <!-- 传输并发（一期串行 = 1） -->
+    <integer name="transfer_concurrency">1</integer>
+</resources>

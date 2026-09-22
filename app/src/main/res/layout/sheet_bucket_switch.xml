@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 桶切换面板。P4-A（桶行由代码动态构建）。 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/space_4">
+
+    <View
+        android:layout_width="@dimen/sheet_handle_width"
+        android:layout_height="@dimen/sheet_handle_height"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/space_2"
+        android:background="@drawable/bg_sheet_handle" />
+
+    <TextView
+        android:id="@+id/bucket_switch_title"
+        style="@style/TextAppearance.R2Manager.PageTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_4"
+        android:layout_marginTop="@dimen/space_3"
+        android:text="@string/browser_bucket_switch_title" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_2"
+        android:maxHeight="360dp">
+
+        <LinearLayout
+            android:id="@+id/bucket_switch_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+</LinearLayout>

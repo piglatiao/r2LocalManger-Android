@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 设置各二级页与设置首页文案（P4-B 独占）。 -->
+<resources>
+
+    <!-- ===== 设置首页 ===== -->
+    <string name="settings_title">设置</string>
+    <string name="settings_section_account">账号与凭证</string>
+    <string name="settings_section_storage">存储</string>
+    <string name="settings_section_security">安全</string>
+    <string name="settings_section_advanced">高级</string>
+
+    <string name="settings_credentials">R2 凭证配置</string>
+    <string name="settings_credentials_meta">Account ID · API Token · Access Key</string>
+    <string name="settings_account">已登录账号</string>
+    <string name="settings_account_none">未配置</string>
+    <string name="settings_bucket">存储桶设置</string>
+    <string name="settings_bucket_meta">当前：%1$s · 共 %2$d 个</string>
+    <string name="settings_cache">缓存设置</string>
+    <string name="settings_cache_meta">缩略图 %1$s / %2$s</string>
+    <string name="settings_security">安全与密码</string>
+    <string name="settings_security_on">应用锁已启用</string>
+    <string name="settings_security_off">应用锁未启用</string>
+    <string name="settings_advanced">自定义域名与 r2.dev</string>
+    <string name="settings_advanced_meta">%1$d 个自定义域名</string>
+    <string name="settings_logs">运行日志</string>
+    <string name="settings_logs_meta">最近 200 条 · 可导出分享</string>
+    <string name="settings_version">R2 存储管理器 v1.0.0 (Android)</string>
+
+    <!-- 设置首页副标题（无需网络即可展示） -->
+    <string name="settings_cache_on">缩略图缓存已开启 · 上限 %1$s</string>
+    <string name="settings_cache_off">缩略图缓存已关闭</string>
+    <string name="settings_bucket_none">未选择存储桶</string>
+    <string name="settings_advanced_none">未绑定自定义域名</string>
+    <string name="settings_autolock_sub_never">后台从不自动上锁</string>
+    <string name="settings_autolock_sub_immediate">返回后台后立即上锁</string>
+    <string name="settings_autolock_sub_minutes">返回后台 %1$d 分钟后上锁</string>
+
+    <!-- 后台自动上锁选项 -->
+    <string name="autolock_option_immediate">立即</string>
+    <string name="autolock_option_1">1 分钟</string>
+    <string name="autolock_option_5">5 分钟</string>
+    <string name="autolock_option_15">15 分钟</string>
+    <string name="autolock_option_never">从不</string>
+
+    <!-- ===== 凭证配置 ===== -->
+    <string name="credentials_title">R2 凭证配置</string>
+    <string name="credentials_banner_lock">当前未启用应用锁，本机任何人都能查看这些凭证。建议到“安全与密码”启用。</string>
+    <string name="credentials_account">Cloudflare Account ID</string>
+    <string name="credentials_token">Cloudflare API Token</string>
+    <string name="credentials_token_help">用于存储桶、自定义域名、r2.dev 等管理操作。</string>
+    <string name="credentials_access_key">Access Key ID</string>
+    <string name="credentials_secret_key">Secret Access Key</string>
+    <string name="credentials_jurisdiction">cf-r2-jurisdiction</string>
+    <string name="credentials_jurisdiction_help">可选值：default / eu / fedramp</string>
+    <string name="credentials_endpoint">Endpoint（自动生成）</string>
+    <string name="credentials_endpoint_hint">填写 Account ID 后自动生成</string>
+    <string name="credentials_region">区域</string>
+    <string name="credentials_test">测试连接</string>
+    <string name="credentials_save">保存</string>
+    <string name="credentials_clear">清除已保存的凭证</string>
+    <string name="credentials_clear_confirm">确定清除已保存的凭证？清除后需重新填写。</string>
+    <string name="credentials_saved">凭证已保存</string>
+    <string name="credentials_test_ok">连接正常</string>
+    <string name="credentials_test_fail">连接失败</string>
+    <string name="credentials_required">请填写 Account ID、Access Key 与 Secret Key</string>
+    <string name="credentials_cleared">凭证已清除</string>
+
+    <!-- ===== 存储桶设置 ===== -->
+    <string name="bucket_title">存储桶设置</string>
+    <string name="bucket_current">当前存储桶</string>
+    <string name="bucket_all">全部存储桶（%1$d）</string>
+    <string name="bucket_create_section">新建存储桶</string>
+    <string name="bucket_name">桶名</string>
+    <string name="bucket_name_hint">new-bucket-name</string>
+    <string name="bucket_name_help">3–64 位，小写字母 / 数字 / 中划线，首尾不能是中划线。</string>
+    <string name="bucket_location">位置提示</string>
+    <string name="bucket_storage_class">存储类型</string>
+    <string name="bucket_create">创建桶</string>
+    <string name="bucket_edit_current">编辑 / 删除当前桶</string>
+    <string name="bucket_update_class">更新存储类型</string>
+    <string name="bucket_delete">删除桶</string>
+    <string name="bucket_delete_help">删除会先清空桶内所有对象，再执行删除。</string>
+    <string name="bucket_current_tag">当前使用</string>
+    <string name="bucket_delete_confirm_title">删除存储桶</string>
+    <string name="bucket_delete_confirm_message">此操作会先清空桶内全部对象，再删除桶“%1$s”。请输入桶名以确认。</string>
+    <string name="bucket_name_invalid">桶名不合法（3–64 位，小写字母 / 数字 / 中划线）</string>
+    <string name="bucket_created">存储桶已创建</string>
+    <string name="bucket_class_updated">存储类型已更新</string>
+    <string name="bucket_deleted">存储桶已删除</string>
+    <string name="bucket_switch_hint">已切换到 %1$s</string>
+
+    <!-- ===== 缓存设置 ===== -->
+    <string name="cache_title">缓存设置</string>
+    <string name="cache_thumb_enable">启用本地缩略图缓存</string>
+    <string name="cache_thumb_enable_sub">图片与视频首帧压缩后落盘（AES-256-GCM 加密）</string>
+    <string name="cache_list_enable">缓存文件列表</string>
+    <string name="cache_list_enable_sub">切换桶 / 目录直接本地秒开</string>
+    <string name="cache_limit">缓存大小上限</string>
+    <string name="cache_limit_help">可选项 128 MB / 256 MB / 512 MB / 1 GB / 2 GB / 4 GB。</string>
+    <string name="cache_usage">当前占用</string>
+    <string name="cache_usage_value">%1$s / %2$s</string>
+    <string name="cache_entries">缩略图条目</string>
+    <string name="cache_folders">已缓存目录</string>
+    <string name="cache_dir">缓存目录</string>
+    <string name="cache_clear">清理缓存</string>
+    <string name="cache_refresh">刷新状态</string>
+    <string name="cache_open_dir">打开缓存目录</string>
+    <string name="cache_clear_confirm">确定清理全部缓存？将删除缩略图与文件列表缓存。</string>
+    <string name="cache_cleared">已清理 %1$d 项，释放 %2$s</string>
+    <string name="cache_copy_path">复制路径</string>
+
+    <!-- ===== 安全与密码 ===== -->
+    <string name="security_title">安全与密码</string>
+    <string name="security_desc">启用后启动应用需要输入密码。本地缓存（缩略图、文件列表）会用该密码加密保存，忘记密码时可用当前存储桶的 Cloudflare 凭据找回。</string>
+    <string name="security_lock_enable">启用应用密码锁</string>
+    <string name="security_lock_enable_sub">冷启动需解锁</string>
+    <string name="security_biometric">优先生物识别</string>
+    <string name="security_biometric_sub">指纹 / 人脸，失败回退密码</string>
+    <string name="security_autolock">后台自动上锁</string>
+    <string name="security_autolock_sub">退到后台 %1$s 后再次上锁</string>
+    <string name="security_autolock_dialog">后台自动上锁</string>
+    <string name="security_current">当前密码</string>
+    <string name="security_current_hint">关闭密码锁或修改密码时需要填写</string>
+    <string name="security_new">新密码</string>
+    <string name="security_new_hint">启用时设置密码 / 修改时填写新密码</string>
+    <string name="security_confirm">确认新密码</string>
+    <string name="security_confirm_hint">请再次输入新密码</string>
+    <string name="security_change">修改密码</string>
+    <string name="security_danger_title">危险操作</string>
+    <string name="security_danger_desc">清除已保存的凭证后需要重新输入才能使用应用。</string>
+    <string name="security_clear_credentials">清除已保存的凭证</string>
+    <string name="security_error_short">密码至少需要 4 位字符</string>
+    <string name="security_error_mismatch">两次输入的密码不一致</string>
+    <string name="security_error_current">当前密码不正确</string>
+    <string name="security_error_need_current">请填写当前密码</string>
+    <string name="security_password_changed">密码已修改</string>
+    <string name="security_lock_enabled">应用锁已启用</string>
+    <string name="security_lock_disabled">应用锁已关闭</string>
+    <string name="security_lock_cache_wipe">启用或关闭应用锁会清空并重建全部本地缓存（缩略图、文件列表）。</string>
+
+    <!-- ===== 高级（自定义域名 / r2.dev） ===== -->
+    <string name="advanced_title">自定义域名与 r2.dev</string>
+    <string name="advanced_public">公开访问地址</string>
+    <string name="advanced_public_priority">优先级：启用的自定义域名 → r2.dev → S3 端点</string>
+    <string name="advanced_domains">自定义域名（%1$d）</string>
+    <string name="advanced_bind_section">绑定新域名</string>
+    <string name="advanced_domain">域名</string>
+    <string name="advanced_domain_hint">files.example.com</string>
+    <string name="advanced_zone">可用域名（Zone）</string>
+    <string name="advanced_zone_help">从当前账号的可用域名中选择，自动使用对应 Zone ID。</string>
+    <string name="advanced_min_tls">最低 TLS 版本</string>
+    <string name="advanced_bind">绑定域名</string>
+    <string name="advanced_r2dev_section">r2.dev 公开访问</string>
+    <string name="advanced_r2dev_enable">启用 r2.dev</string>
+    <string name="advanced_r2dev_help">仅用于调试与临时分享，生产环境建议使用自定义域名。</string>
+    <string name="advanced_edit">编辑</string>
+    <string name="advanced_unbind">解绑</string>
+    <string name="advanced_enabled">已启用</string>
+    <string name="advanced_disabled">已停用</string>
+    <string name="advanced_no_domain">未绑定自定义域名</string>
+    <string name="advanced_need_domain">请填写域名并选择可用域名</string>
+    <string name="advanced_bound">域名已绑定</string>
+    <string name="advanced_unbound">域名已解绑</string>
+    <string name="advanced_zone_prefix">Zone：%1$s · 最低 TLS %2$s</string>
+
+    <!-- ===== 运行日志 ===== -->
+    <string name="logs_title">运行日志</string>
+    <string name="logs_export">导出日志</string>
+    <string name="logs_clear">清空</string>
+    <string name="logs_empty">暂无日志</string>
+    <string name="logs_cleared">日志已清空</string>
+
+</resources>

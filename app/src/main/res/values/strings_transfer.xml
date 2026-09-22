@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 传输（上传 / 下载 / 传输中心）页面文案（P4-B 独占）。 -->
+<resources>
+
+    <!-- ===== 传输中心 ===== -->
+    <string name="transfer_title">传输任务</string>
+    <string name="transfer_tab_running">进行中</string>
+    <string name="transfer_tab_completed">已完成</string>
+    <string name="transfer_tab_failed">失败</string>
+    <string name="transfer_tab_running_count">进行中 %1$d</string>
+    <string name="transfer_tab_completed_count">已完成 %1$d</string>
+    <string name="transfer_tab_failed_count">失败 %1$d</string>
+
+    <string name="transfer_empty_running">没有进行中的任务</string>
+    <string name="transfer_empty_completed">还没有完成的任务</string>
+    <string name="transfer_empty_failed">没有失败的任务</string>
+    <string name="transfer_empty_all">上传与下载任务会出现在这里</string>
+
+    <string name="transfer_direction_upload">上传</string>
+    <string name="transfer_direction_download">下载</string>
+
+    <string name="transfer_status_running">进行中</string>
+    <string name="transfer_status_done">完成</string>
+    <string name="transfer_status_failed">失败</string>
+    <string name="transfer_status_cancelled">已取消</string>
+    <string name="transfer_status_queued">等待中</string>
+
+    <string name="transfer_action_retry">重试</string>
+    <string name="transfer_action_remove">移除任务</string>
+    <string name="transfer_action_cancel">取消</string>
+    <string name="transfer_clear_completed">清空已完成</string>
+    <string name="transfer_retry_all">重试全部</string>
+    <string name="transfer_cancel_all">全部取消</string>
+
+    <string name="transfer_meta_progress">%1$s / %2$s · %3$s</string>
+    <string name="transfer_meta_eta">剩余 %1$s</string>
+    <string name="transfer_progress_percent">%1$d%%</string>
+    <string name="transfer_cancelled_toast">已取消</string>
+    <string name="transfer_removed_toast">已移除任务</string>
+    <string name="transfer_started_toast">已加入传输队列</string>
+
+    <!-- 应用内进度卡片 -->
+    <string name="transfer_card_uploading">上传 %1$s</string>
+    <string name="transfer_card_downloading">下载 %1$s</string>
+    <string name="transfer_card_view_all">查看全部任务</string>
+
+    <!-- 通知（前台服务） -->
+    <string name="transfer_notif_uploading">正在上传 · %1$s</string>
+    <string name="transfer_notif_downloading">正在下载 · %1$s</string>
+
+    <!-- ===== 上传来源面板 ===== -->
+    <string name="transfer_upload_to">上传到 %1$s</string>
+    <string name="transfer_upload_to_root">上传到根目录</string>
+    <string name="transfer_upload_sub">选择上传来源 · 多选会串行上传</string>
+    <string name="transfer_source_photo">照片和视频</string>
+    <string name="transfer_source_photo_sub">系统选择器，无需存储权限</string>
+    <string name="transfer_source_doc">文档与压缩包</string>
+    <string name="transfer_source_doc_sub">SAF 多选，可跨目录</string>
+    <string name="transfer_source_camera">拍照上传</string>
+    <string name="transfer_source_camera_sub">拍完直接上传</string>
+
+    <!-- ===== 下载面板 ===== -->
+    <string name="transfer_download_title">下载 %1$s</string>
+    <string name="transfer_download_sub">%1$s · 请选择保存位置</string>
+    <string name="transfer_download_system">系统下载目录</string>
+    <string name="transfer_download_system_sub">MediaStore.Downloads · 推荐</string>
+    <string name="transfer_download_other">选择其他目录…</string>
+    <string name="transfer_download_other_sub">SAF 授权，批量下载保留相对路径</string>
+    <string name="transfer_download_remember">记住此目录</string>
+    <string name="transfer_download_remember_sub">下次下载直接使用</string>
+    <string name="transfer_download_start">开始下载</string>
+    <string name="transfer_download_need_dir">请先选择保存目录</string>
+
+    <!-- ===== 同名冲突 ===== -->
+    <string name="transfer_conflict_title">发现同名对象</string>
+    <string name="transfer_conflict_message">以下 %1$d 个文件已存在，继续将覆盖：\n%2$s</string>
+    <string name="transfer_conflict_confirm">覆盖上传</string>
+
+</resources>

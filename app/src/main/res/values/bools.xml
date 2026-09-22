@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 布尔 token。P1 独占文件。 -->
+<resources>
+    <!-- 一期仅浅色 -->
+    <bool name="is_light_theme">true</bool>
+    <!-- 视频预览一期使用 framework VideoView（主理人裁决：不引入 media3） -->
+    <bool name="use_framework_video_view">true</bool>
+    <!-- 列表默认视图是否为列表（false 则由用户偏好决定） -->
+    <bool name="default_list_view">true</bool>
+</resources>

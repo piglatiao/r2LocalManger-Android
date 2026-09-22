@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 存储桶行（P4-B）：图标 + 桶名 + 位置/类型 + 当前标记。 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_list_item_ripple"
+    android:gravity="center_vertical"
+    android:minHeight="@dimen/list_row_height_double"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/list_item_padding_horizontal"
+    android:paddingTop="@dimen/list_item_padding_vertical"
+    android:paddingEnd="@dimen/list_item_padding_horizontal"
+    android:paddingBottom="@dimen/list_item_padding_vertical">
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/bg_thumb_placeholder"
+        android:contentDescription="@null"
+        android:padding="@dimen/space_2"
+        android:src="@drawable/ic_db" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_3"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.R2Manager.ListTitle" />
+
+        <TextView
+            android:id="@+id/tvMeta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.R2Manager.Caption" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvCurrent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_2"
+        android:background="@drawable/bg_chip"
+        android:paddingStart="@dimen/space_2"
+        android:paddingTop="@dimen/space_1"
+        android:paddingEnd="@dimen/space_2"
+        android:paddingBottom="@dimen/space_1"
+        android:text="@string/bucket_current_tag"
+        android:textAppearance="@style/TextAppearance.R2Manager.Caption"
+        android:textColor="@color/brand_ink"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/ivCheck"
+        android:layout_width="@dimen/icon_size_small"
+        android:layout_height="@dimen/icon_size_small"
+        android:layout_marginStart="@dimen/space_2"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_check"
+        android:tint="@color/brand"
+        android:visibility="gone" />
+
+</LinearLayout>
