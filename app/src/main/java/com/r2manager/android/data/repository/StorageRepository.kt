@@ -12,10 +12,13 @@ import com.r2manager.android.data.remote.ConnectivityMonitor
 import com.r2manager.android.data.remote.s3.S3Client
 import com.r2manager.android.data.remote.s3.S3ClientImpl
 import com.r2manager.android.data.remote.s3.S3Config
+import com.r2manager.android.data.remote.s3.S3ErrorCodes
+import com.r2manager.android.data.remote.s3.S3Exception
 import com.r2manager.android.domain.model.BatchDeleteResult
 import com.r2manager.android.domain.model.ObjectInfo
 import com.r2manager.android.domain.model.ObjectMeta
 import com.r2manager.android.domain.model.ThumbnailMeta
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -207,10 +210,47 @@ class StorageRepositoryImpl(
         invalidateForKey(config.bucket, key)
     }
 
+    /** 批量签名失败时按单对象接口顺序回退；任一项失败后停止后续请求。 */
     override suspend fun deleteBatch(keys: List<String>): BatchDeleteResult =
         withContext(ioDispatcher) {
             val config = currentConfig() ?: throw IllegalStateException("S3 未配置")
-            val result = clientOf(config).deleteObjects(keys)
+            val client = clientOf(config)
+            val result = try {
+                client.deleteObjects(keys)
+            } catch (error: S3Exception) {
+                if (error.code != S3ErrorCodes.SIGNATURE_DOES_NOT_MATCH) {
+                    throw error
+                }
+                val deletedKeys = ArrayList<String>(keys.size)
+                val errors = ArrayList<BatchDeleteResult.DeleteError>()
+                for ((index, key) in keys.withIndex()) {
+                    try {
+                        client.deleteObject(key)
+                        deletedKeys.add(key)
+                    } catch (cancelled: CancellationException) {
+                        throw cancelled
+                    } catch (deleteError: Exception) {
+                        errors.add(
+                            BatchDeleteResult.DeleteError(
+                                key = key,
+                                code = (deleteError as? S3Exception)?.code,
+                                message = deleteError.message.orEmpty()
+                            )
+                        )
+                        for (unattemptedKey in keys.drop(index + 1)) {
+                            errors.add(
+                                BatchDeleteResult.DeleteError(
+                                    key = unattemptedKey,
+                                    code = null,
+                                    message = "前一项删除失败，未执行"
+                                )
+                            )
+                        }
+                        break
+                    }
+                }
+                BatchDeleteResult(deletedKeys, errors)
+            }
             for (key in keys) {
                 invalidateForKey(config.bucket, key)
             }

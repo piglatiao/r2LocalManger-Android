@@ -3,6 +3,7 @@ package com.r2manager.android.data.remote.s3
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import okio.Buffer
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
@@ -42,5 +43,39 @@ class S3RequestFactoryTest {
 
         assertEquals("bucket.account.r2.cloudflarestorage.com", request.url.host)
         assertEquals("/dir/a%20b.txt", request.url.encodedPath)
+    }
+
+    @Test
+    fun deleteObjectsMatchesDesktopXmlAndSignsChecksums() {
+        val xml = S3XmlParser.buildDeleteObjectsBody(
+            listOf("a&b.txt", "c<d>.txt", "\u4e2d\u6587 name.png")
+        )
+        val request = factory.deleteObjects(xml)
+        val body = Buffer()
+        request.body!!.writeTo(body)
+
+        assertEquals("POST", request.method)
+        assertEquals("delete=", request.url.encodedQuery)
+        assertEquals(xml, body.readUtf8())
+        assertEquals("247", request.header("Content-Length"))
+        assertEquals("CRC32", request.header("x-amz-sdk-checksum-algorithm"))
+        assertEquals("mSyhYw==", request.header("x-amz-checksum-crc32"))
+        assertEquals(SigV4Signer.sha256Hex(xml), request.header("x-amz-content-sha256"))
+        assertTrue(
+            request.header("Authorization").orEmpty().contains(
+                "SignedHeaders=content-length;content-type;host;x-amz-checksum-crc32;" +
+                    "x-amz-content-sha256;x-amz-date;x-amz-sdk-checksum-algorithm"
+            )
+        )
+    }
+
+    @Test
+    fun singleDeleteRemainsSeparateFromBatchChecksumHeaders() {
+        val request = factory.deleteObject("dir/a.webp")
+
+        assertEquals("DELETE", request.method)
+        assertEquals("/dir/a.webp", request.url.encodedPath)
+        assertEquals(null, request.header("x-amz-sdk-checksum-algorithm"))
+        assertEquals(null, request.header("x-amz-checksum-crc32"))
     }
 }

@@ -6,7 +6,10 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.nio.ByteBuffer
 import java.time.Clock
+import java.util.Base64
+import java.util.zip.CRC32
 
 /**
  * 构造并签名 S3 请求（virtual-hosted-style：`<bucket>.<endpoint>/<key>`）。
@@ -125,16 +128,29 @@ class S3RequestFactory(
             contentType = null
         )
 
-    /** `POST /?delete`（XML 体，签名真实 SHA-256）。 */
-    fun deleteObjects(xml: String): Request =
-        build(
+    /** `POST /?delete`（XML 体，签名请求体 SHA-256）。 */
+    fun deleteObjects(xml: String): Request {
+        val body = xml.toRequestBody(XML_MEDIA_TYPE)
+        val xmlBytes = xml.toByteArray(Charsets.UTF_8)
+        val crc32 = CRC32().apply { update(xmlBytes) }.value.toInt()
+        val checksum = Base64.getEncoder().encodeToString(
+            ByteBuffer.allocate(Int.SIZE_BYTES).putInt(crc32).array()
+        )
+
+        return build(
             method = "POST",
             rawPath = bucketPath(),
             query = mapOf("delete" to ""),
-            body = xml.toRequestBody(XML_MEDIA_TYPE),
+            body = body,
             payloadHash = SigV4Signer.sha256Hex(xml),
-            contentType = XML_CONTENT_TYPE
+            contentType = XML_CONTENT_TYPE,
+            additionalHeaders = mapOf(
+                "content-length" to body.contentLength().toString(),
+                "x-amz-sdk-checksum-algorithm" to "CRC32",
+                "x-amz-checksum-crc32" to checksum
+            )
         )
+    }
 
     // ———————————————————— 内部 ————————————————————
 
@@ -149,7 +165,8 @@ class S3RequestFactory(
         query: Map<String, String>,
         body: RequestBody?,
         payloadHash: String,
-        contentType: String?
+        contentType: String?,
+        additionalHeaders: Map<String, String> = emptyMap()
     ): Request {
         val canonicalUri = SigV4Signer.canonicalUri(rawPath)
         val canonicalQuery = SigV4Signer.canonicalQueryString(query)
@@ -164,6 +181,7 @@ class S3RequestFactory(
         if (contentType != null) {
             signHeaders["content-type"] = contentType
         }
+        signHeaders.putAll(additionalHeaders)
 
         val signedHeaders = SigV4Signer.sign(
             req = S3SignRequest(
@@ -185,6 +203,9 @@ class S3RequestFactory(
                 "content-type" -> Unit    // 由 RequestBody 提供
                 else -> builder.header(name, value)
             }
+        }
+        for ((name, value) in additionalHeaders) {
+            builder.header(name, value)
         }
         if (contentType != null) {
             builder.header("Content-Type", contentType)

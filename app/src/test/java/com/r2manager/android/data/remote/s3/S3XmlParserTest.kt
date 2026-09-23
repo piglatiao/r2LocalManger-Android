@@ -124,9 +124,14 @@ class S3XmlParserTest {
     @Test
     fun buildsDeleteObjectsBodyWithEscaping() {
         val body = S3XmlParser.buildDeleteObjectsBody(listOf("a&b.txt", "c<d>.txt"))
-        assertTrue(body.contains("<Quiet>false</Quiet>"))
-        assertTrue(body.contains("<Object><Key>a&amp;b.txt</Key></Object>"))
-        assertTrue(body.contains("<Object><Key>c&lt;d&gt;.txt</Key></Object>"))
+        assertEquals(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<Delete xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">" +
+                "<Object><Key>a&amp;b.txt</Key></Object>" +
+                "<Object><Key>c&lt;d&gt;.txt</Key></Object>" +
+                "<Quiet>false</Quiet></Delete>",
+            body
+        )
     }
 
     @Test

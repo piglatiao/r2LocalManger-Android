@@ -104,11 +104,11 @@ object S3XmlParser {
     /** 构造 `DeleteObjects` 请求体（`Quiet=false`）。 */
     fun buildDeleteObjectsBody(keys: List<String>): String = buildString {
         append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
-        append("<Delete>")
-        append("<Quiet>false</Quiet>")
+        append("<Delete xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">")
         for (key in keys) {
             append("<Object><Key>").append(escapeXml(key)).append("</Key></Object>")
         }
+        append("<Quiet>false</Quiet>")
         append("</Delete>")
     }
 
