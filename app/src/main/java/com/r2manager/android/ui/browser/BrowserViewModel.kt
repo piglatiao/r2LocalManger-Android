@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import com.r2manager.android.AppContainer
 import com.r2manager.android.core.error.ErrorMapper
+import com.r2manager.android.core.log.AppLog
 import com.r2manager.android.core.mime.FileTypes
 import com.r2manager.android.core.mime.PreviewKind
 import com.r2manager.android.core.util.UriUtils
@@ -12,6 +13,7 @@ import com.r2manager.android.domain.model.CopyFormat
 import com.r2manager.android.domain.model.ObjectInfo
 import com.r2manager.android.domain.transfer.DownloadRequest
 import com.r2manager.android.ui.common.AppViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -309,27 +311,45 @@ class BrowserViewModel(container: AppContainer) : AppViewModel(container) {
         _events.trySend(BrowserEvent.ConfirmDelete(keys, names))
     }
 
-    /** 执行删除。 */
+    /** 执行删除：单项使用单删接口，多项使用批量接口。 */
     fun confirmDelete(keys: List<String>) {
         if (keys.isEmpty()) {
             return
         }
         appScope.launch {
-            val succeeded = runCatching {
-                container.storageRepository.deleteBatch(keys)
-            }.getOrNull()
-            if (succeeded != null) {
-                val failedDeletes = succeeded.errors.map { it.key }
-                _state.update { it.copy(selectedKeys = emptySet()) }
-                if (failedDeletes.isEmpty()) {
-                    _events.trySend(BrowserEvent.Message(com.r2manager.android.R.string.browser_delete_done))
+            val failedDeletes = try {
+                if (keys.size == 1) {
+                    container.storageRepository.delete(keys.single())
+                    emptyList()
                 } else {
-                    _events.trySend(BrowserEvent.MessageText("部分删除失败：${failedDeletes.size} 项"))
+                    container.storageRepository.deleteBatch(keys).errors.map { it.key }
                 }
-                load(forceRefresh = true, isRefresh = false)
-            } else {
-                _events.trySend(BrowserEvent.Message(com.r2manager.android.R.string.error_unknown))
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (t: Exception) {
+                val error = ErrorMapper.fromThrowable(t, "delete")
+                AppLog.e(
+                    "BrowserViewModel",
+                    "文件删除失败 errorType=${error.type} s3Code=${error.s3Code.orEmpty()} " +
+                        "httpStatus=${error.httpStatus ?: 0} exception=${t.javaClass.simpleName}"
+                )
+                val message = container.appContext.getString(error.messageResId)
+                val detail = ErrorMapper.detailFor(container.appContext, error)
+                _events.trySend(
+                    BrowserEvent.MessageText(
+                        if (detail.isNullOrBlank()) message else "$message\n$detail"
+                    )
+                )
+                return@launch
             }
+
+            _state.update { it.copy(selectedKeys = emptySet()) }
+            if (failedDeletes.isEmpty()) {
+                _events.trySend(BrowserEvent.Message(com.r2manager.android.R.string.browser_delete_done))
+            } else {
+                _events.trySend(BrowserEvent.MessageText("部分删除失败：${failedDeletes.size} 项"))
+            }
+            load(forceRefresh = true, isRefresh = false)
         }
     }
 
