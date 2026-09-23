@@ -60,19 +60,41 @@ class AppLockManager(
     }
 
     /**
-     * 冷启动准备密钥（§5.4）：
-     * - 已启用锁 → 清除会话密钥，保持 `locked=true`，等用户解锁；
-     * - 未启用锁 → 准备随机回退密钥，`locked=false`。
+     * 冷启动准备本地缓存密钥。
+     *
+     * 安卓端应用锁交给系统管理，应用内部不再要求密码或生物识别；升级旧版本时仅清理
+     * 旧应用锁无法继续解密的本地缓存，凭证与远端数据保持不变。
      */
     suspend fun bootstrap(): AppLockStatus {
-        val current = status()
-        return if (current.enabled && current.hasPassword) {
-            keyManager.clearKey()
-            status()
-        } else {
-            keyManager.provisionFallbackKey()
-            status()
-        }
+        migrateLegacyAppLock()
+        keyManager.provisionFallbackKey()
+        return status()
+    }
+
+    /**
+     * 清理旧版本的应用内密码锁状态。
+     *
+     * 旧缓存使用密码派生密钥，移除应用内密码后无法继续解密；凭证由独立 Keystore 密钥保护，
+     * 不在清理范围内。迁移标记通过删除旧锁字段完成，后续启动不会重复清理。
+     */
+    private suspend fun migrateLegacyAppLock() {
+        val raw = settings.raw()
+        val hasLegacyLock = raw.getBoolean(PrefKeys.APP_LOCK_ENABLED, false) ||
+            !raw.getString(PrefKeys.APP_LOCK_SALT, null).isNullOrEmpty() ||
+            !raw.getString(PrefKeys.APP_LOCK_VERIFIER, null).isNullOrEmpty() ||
+            keyManager.hasBiometricKey()
+        if (!hasLegacyLock) return
+
+        val cleared = cacheEraser.clearAll()
+        Log.i(TAG, "迁移系统应用锁前已清理旧缓存：${cleared.first} 项 / ${cleared.second} 字节")
+        keyManager.clearKey()
+        keyManager.forgetBiometricKey()
+        raw.edit()
+            .putBoolean(PrefKeys.APP_LOCK_ENABLED, false)
+            .putBoolean(PrefKeys.APP_LOCK_DISMISSED, true)
+            .remove(PrefKeys.APP_LOCK_SALT)
+            .remove(PrefKeys.APP_LOCK_VERIFIER)
+            .apply()
     }
 
     /** 用密码解锁应用。连续失败计数由 [attempts] 管理。 */

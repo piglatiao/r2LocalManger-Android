@@ -17,9 +17,10 @@
     <string name="settings_bucket_meta">当前：%1$s · 共 %2$d 个</string>
     <string name="settings_cache">缓存设置</string>
     <string name="settings_cache_meta">缩略图 %1$s / %2$s</string>
-    <string name="settings_security">安全与密码</string>
-    <string name="settings_security_on">应用锁已启用</string>
-    <string name="settings_security_off">应用锁未启用</string>
+    <string name="settings_security">系统应用锁</string>
+    <string name="settings_security_on">由系统管理</string>
+    <string name="settings_security_off">由系统管理</string>
+    <string name="settings_security_system">由 Android / vivo 系统管理</string>
     <string name="settings_advanced">自定义域名与 r2.dev</string>
     <string name="settings_advanced_meta">%1$d 个自定义域名</string>
     <string name="settings_logs">运行日志</string>
@@ -110,9 +111,12 @@
     <string name="cache_cleared">已清理 %1$d 项，释放 %2$s</string>
     <string name="cache_copy_path">复制路径</string>
 
-    <!-- ===== 安全与密码 ===== -->
-    <string name="security_title">安全与密码</string>
-    <string name="security_desc">启用后启动应用需要输入密码。本地缓存（缩略图、文件列表）会用该密码加密保存，忘记密码时可用当前存储桶的 Cloudflare 凭据找回。</string>
+    <!-- ===== 系统安全 ===== -->
+    <string name="security_title">系统应用锁</string>
+    <string name="security_desc">应用内不设置密码，应用保护由 Android / vivo 系统应用锁负责。</string>
+    <string name="security_system_title">应用锁由系统管理</string>
+    <string name="security_system_desc">请在手机系统设置中为 R2 存储管理器开启应用锁。</string>
+    <string name="security_system_note">系统应用锁未开启时，应用会直接进入；系统锁定策略、指纹和设备密码均由手机系统控制。</string>
     <string name="security_lock_enable">启用应用密码锁</string>
     <string name="security_lock_enable_sub">冷启动需解锁</string>
     <string name="security_biometric">优先生物识别</string>

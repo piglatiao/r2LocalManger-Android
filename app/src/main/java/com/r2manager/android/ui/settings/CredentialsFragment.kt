@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
  * R2 凭证配置（P4-B）。
  *
  * 四字段：Account ID / API Token（管理面）/ Access Key / Secret Key（数据面）+ jurisdiction 下拉；
- * Endpoint 与 Region 只读（Endpoint 由 Account ID 自动派生）。未启用应用锁时顶部显示安全提示条。
+ * Endpoint 与 Region 只读（Endpoint 由 Account ID 自动派生）。
  */
 class CredentialsFragment : Fragment() {
 
@@ -56,9 +56,6 @@ class CredentialsFragment : Fragment() {
         bindDropdown(binding.acJurisdiction, jurisdictionOptions)
         binding.acJurisdiction.setText(NetworkConstants.DEFAULT_JURISDICTION, false)
         binding.etRegion.setText(viewModel.region())
-
-        binding.bannerLock.visibility =
-            if (viewModel.isAppLockEnabled()) View.GONE else View.VISIBLE
 
         binding.etAccountId.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit

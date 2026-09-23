@@ -21,7 +21,7 @@ import com.r2manager.android.databinding.ItemSettingBinding
  * 首页行用 [ItemSettingBinding] 动态构建进 `listContainer`，子页用 `childFragmentManager`
  * 替换进 `subContainer`（同一页面内二级导航，避免额外 Activity）。
  *
- * 子页：凭证配置 / 存储桶 / 缓存 / 安全与密码 / 高级（自定义域名与 r2.dev）/ 运行日志。
+ * 子页：凭证配置 / 存储桶 / 缓存 / 系统应用锁 / 高级（自定义域名与 r2.dev）/ 运行日志。
  */
 class SettingsFragment : Fragment() {
 
@@ -94,11 +94,7 @@ class SettingsFragment : Fragment() {
         } else {
             getString(R.string.settings_cache_off)
         }
-        rowViews[ROW_SECURITY]?.tvMeta?.text = if (settings.appLockEnabled) {
-            getString(R.string.settings_security_on)
-        } else {
-            getString(R.string.settings_security_off)
-        }
+        rowViews[ROW_SECURITY]?.tvMeta?.setText(R.string.settings_security_system)
         rowViews[ROW_ADVANCED]?.tvMeta?.text =
             settings.publicUrl.ifBlank { getString(R.string.settings_advanced_none) }
         rowViews[ROW_LOGS]?.let { it.tvMeta.setText(R.string.settings_logs_meta) }

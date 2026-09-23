@@ -15,7 +15,6 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 
     <application
         android:name=".R2ManagerApp"
@@ -32,7 +31,7 @@
         tools:targetApi="34">
 
         <!--
-          主框架（内部入口）：不对外暴露；仅由 StartupActivity / 解锁页以显式组件启动。
+          主框架（内部入口）：不对外暴露；仅由 StartupActivity 以显式组件启动。
           singleTop 保证复用实例时走 onNewIntent（如通知点击切传输页）。
         -->
         <activity
@@ -43,8 +42,8 @@
             android:windowSoftInputMode="adjustResize" />
 
         <!--
-          启动检查页（唯一对外入口）：冷启动分流 + 应用锁闸门。
-          硬不变式：应用锁校验（AppLockManager.bootstrap）必须先于任何桶/凭证内容展示。
+          启动检查页（唯一对外入口）：冷启动分流和旧应用锁迁移。
+          应用保护由 Android / vivo 系统应用锁管理。
         -->
         <activity
             android:name=".ui.startup.StartupActivity"
@@ -67,27 +66,6 @@
                 <data android:mimeType="*/*" />
             </intent-filter>
         </activity>
-
-        <!-- 应用锁解锁页 -->
-        <activity
-            android:name=".ui.lock.LockActivity"
-            android:exported="false"
-            android:excludeFromRecents="true"
-            android:theme="@style/Theme.R2Manager" />
-
-        <!-- 应用锁设置页（首次设置 PIN） -->
-        <activity
-            android:name=".ui.lock.LockSetupActivity"
-            android:exported="false"
-            android:theme="@style/Theme.R2Manager"
-            android:windowSoftInputMode="adjustResize" />
-
-        <!-- 找回密码页 -->
-        <activity
-            android:name=".ui.lock.ResetPasswordActivity"
-            android:exported="false"
-            android:theme="@style/Theme.R2Manager"
-            android:windowSoftInputMode="adjustResize" />
 
         <!-- 预览页 -->
         <activity

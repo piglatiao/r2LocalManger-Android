@@ -44,9 +44,6 @@ class CredentialsViewModel(private val container: AppContainer) : ViewModel() {
     /** 当前区域（固定 auto）。 */
     fun region(): String = container.settingsRepository.settings().value.region
 
-    /** 应用锁是否已启用（用于未启用时的安全提示条）。 */
-    fun isAppLockEnabled(): Boolean = container.appLockManager.status().enabled
-
     companion object {
         /**
          * 构造工厂。

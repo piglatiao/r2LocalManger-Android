@@ -18,12 +18,6 @@ sealed interface StartupUiState {
     /** 检查中（展示骨架 / 转圈）。 */
     data object Checking : StartupUiState
 
-    /** 需要解锁（已启用应用锁且未持钥）→ 启动 `LockActivity`。 */
-    data object RequiresLock : StartupUiState
-
-    /** 首次启动密码引导（可跳过，不阻塞进入应用）。 */
-    data object NeedsPasswordSetup : StartupUiState
-
     /** 凭证缺失 / 不完整 / 未选桶 → 引导至凭证配置（不发起网络请求，R-01）。 */
     data object MissingCredentials : StartupUiState
 
@@ -38,10 +32,9 @@ sealed interface StartupUiState {
  * 启动页 ViewModel（对应架构 §5.4 冷启动分流）。
  *
  * 流程：
- * 1. [AppContainer.appLockManager].bootstrap() —— 已启用锁则保持 locked，未启用则准备回退密钥；
- * 2. 首次启动先展示可跳过的密码引导；
- * 3. 读取凭证：缺失 / 不完整 / 未选桶 → [StartupUiState.MissingCredentials]（不发网络请求）；
- * 4. 否则 [StartupUiState.Ready]（后台静默探测由凭证保存链路负责，不阻塞启动）。
+ * 1. [AppContainer.appLockManager].bootstrap() —— 迁移旧应用锁并准备本地回退密钥；
+ * 2. 读取凭证：缺失 / 不完整 / 未选桶 → [StartupUiState.MissingCredentials]（不发网络请求）；
+ * 3. 否则 [StartupUiState.Ready]（后台静默探测由凭证保存链路负责，不阻塞启动）。
  *
  * @param container 依赖容器
  */
@@ -56,7 +49,7 @@ class StartupViewModel(container: AppContainer) : AppViewModel(container) {
         start()
     }
 
-    /** 执行一次冷启动分流（含应用锁 bootstrap）。 */
+    /** 执行一次冷启动分流，并完成旧应用锁迁移。 */
     fun start() {
         appScope.launch {
             _state.value = StartupUiState.Checking
@@ -71,41 +64,9 @@ class StartupViewModel(container: AppContainer) : AppViewModel(container) {
                 )
                 return@launch
             }
-            if (bootstrap.getOrThrow().locked) {
-                _state.value = StartupUiState.RequiresLock
-                return@launch
-            }
-            if (bootstrap.getOrThrow().needsSetup) {
-                _state.value = StartupUiState.NeedsPasswordSetup
-                return@launch
-            }
             routeByCredentials()
         }
     }
-
-    /**
-     * 解锁成功后继续分流：**跳过 bootstrap**。
-     *
-     * 注意：[com.r2manager.android.domain.security.AppLockManager.bootstrap] 对「已启用锁」会
-     * 再次 `clearKey()`，重复调用会把刚解锁的会话重新上锁；因此解锁归来只能续跑凭证校验。
-     */
-    fun continueAfterUnlock() {
-        appScope.launch {
-            _state.value = StartupUiState.Checking
-            routeByCredentials()
-        }
-    }
-
-    /** 首次密码引导结束后继续分流，不重复执行 bootstrap。 */
-    fun continueAfterPasswordSetup() {
-        appScope.launch {
-            _state.value = StartupUiState.Checking
-            routeByCredentials()
-        }
-    }
-
-    /** 用户跳过首次密码引导后记录选择，避免下次启动重复提示。 */
-    fun dismissPasswordSetup() = container.appLockManager.dismissSetup()
 
     /**
      * 凭证校验 → 分流（不发网络请求，R-01）：
