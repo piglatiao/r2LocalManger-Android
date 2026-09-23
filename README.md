@@ -102,13 +102,8 @@ r2-manager-android/
 └── README.md
 ```
 
-## 文档与原型
+## 原型
 
-- [需求规格说明书](docs/01-需求规格说明书.md)：产品目标、功能需求、页面地图和非功能需求。
-- [接口与配置清单](docs/02-接口与配置清单.md)：R2 S3 接口、Cloudflare API、配置项、缓存和错误模型。
-- [页面原型与交互说明](docs/03-页面原型与交互说明.md)：页面结构、交互方式和设计规范。
-- [一期 PRD](docs/04-一期PRD.md)：MVP 范围、优先级和验收标准。
-- [架构设计与任务分解](docs/05-架构设计与任务分解.md)：分层架构、包结构、接口契约和任务拆分。
 
 可直接用浏览器打开 [`prototype/index.html`](prototype/index.html) 查看可点击原型。原型为纯静态 HTML/CSS/JavaScript，无需安装额外依赖。
 
