@@ -29,7 +29,9 @@ data class ListResult(
     val isTruncated: Boolean,
     val fromCache: Boolean,
     val cachedAt: Long?,
-    val offline: Boolean
+    val offline: Boolean,
+    /** 是否已有完整的 S3 配置；未配置不应显示为离线。 */
+    val configured: Boolean = true
 )
 
 /** 预览数据（文本 / 二进制流 / 超限）。 */
@@ -99,7 +101,9 @@ class StorageRepositoryImpl(
         pageSize: Int
     ): ListResult = withContext(ioDispatcher) {
         val config = currentConfig()
-            ?: return@withContext ListResult(emptyList(), null, false, false, null, true)
+            ?: return@withContext ListResult(
+                emptyList(), null, false, false, null, offline = false, configured = false
+            )
         val s3 = clientOf(config)
         val bucket = config.bucket
         val normalized = PathUtils.normalizePrefix(prefix)

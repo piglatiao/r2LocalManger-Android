@@ -1,5 +1,6 @@
 package com.r2manager.android.core.error
 
+import android.content.Context
 import com.r2manager.android.R
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -156,6 +157,26 @@ object ErrorMapper {
     fun authDetailFor(type: ErrorType): Int? =
         if (type == ErrorType.AUTH) R.string.error_auth_detail else null
 
+    /**
+     * 生成安全的错误详情，只展示服务端错误码和 HTTP 状态，不展示异常消息或请求签名。
+     *
+     * @param context 用于读取本地化文案
+     * @param error 统一错误模型
+     */
+    fun detailFor(context: Context, error: AppError): String? {
+        val details = ArrayList<String>(3)
+        authDetailFor(error.type)?.let { details.add(context.getString(it)) }
+        error.s3Code
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?.take(MAX_DISPLAY_CODE_LENGTH)
+            ?.let { details.add(context.getString(R.string.error_s3_code, it)) }
+        error.httpStatus
+            ?.takeIf { it > 0 }
+            ?.let { details.add(context.getString(R.string.error_http_status, it)) }
+        return details.takeIf { it.isNotEmpty() }?.joinToString("\n")
+    }
+
     // —— 内部工具 ——
 
     /** 精细文案：FILE_SYSTEM 依据具体 code 区分"不存在/无权限/空间不足"。 */
@@ -199,4 +220,6 @@ object ErrorMapper {
 
     /** 兜底：把 [IOException] 视作网络类（仅在无其它线索时使用，见 [fromThrowable] 的 `else` 分支）。 */
     private fun isGenericIo(t: Throwable): Boolean = t is IOException
+
+    private const val MAX_DISPLAY_CODE_LENGTH = 80
 }

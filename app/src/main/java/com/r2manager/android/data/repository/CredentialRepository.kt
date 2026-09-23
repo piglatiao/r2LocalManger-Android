@@ -1,5 +1,6 @@
 package com.r2manager.android.data.repository
 
+import com.r2manager.android.R
 import com.r2manager.android.core.constants.NetworkConstants
 import com.r2manager.android.core.constants.PrefKeys
 import com.r2manager.android.core.error.AppError
@@ -12,25 +13,24 @@ import com.r2manager.android.data.remote.cf.CfAuth
 import com.r2manager.android.data.remote.cf.CloudflareClientImpl
 import com.r2manager.android.data.remote.s3.S3ClientImpl
 import com.r2manager.android.data.remote.s3.S3Config
+import com.r2manager.android.domain.model.Bucket
 import com.r2manager.android.domain.model.Credentials
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import okhttp3.OkHttpClient
 
-/** 凭证保存结果；[managementApiOk] 为 null 表示管理面探测仍在后台进行。 */
+/** 凭证保存结果；保存完成前会等待一次管理面列桶，便于自动选择首桶。 */
 data class SaveResult(val saved: Boolean, val managementApiOk: Boolean?, val error: AppError?)
 
 /** 连接测试结果。 */
 data class TestResult(val ok: Boolean, val error: AppError?)
 
 /**
- * 凭证仓库：存取 R2 凭证，保存成功后异步探测管理面（不阻塞主链路）。
+ * 凭证仓库：存取 R2 凭证，保存成功后列出存储桶并默认选择首桶。
  */
 interface CredentialRepository {
     suspend fun load(): Credentials?
@@ -50,14 +50,12 @@ interface CredentialRepository {
  * @param store 加密凭证存取
  * @param settings 设置存取（端点/桶/公开域名）
  * @param httpClient 复用的 OkHttp 客户端
- * @param scope 用于「管理面探测」的异步作用域（应用级）
  * @param ioDispatcher IO 调度器
  */
 class CredentialRepositoryImpl(
     private val store: CredentialStore,
     private val settings: SettingsStore,
     private val httpClient: OkHttpClient,
-    private val scope: CoroutineScope,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : CredentialRepository {
 
@@ -75,16 +73,16 @@ class CredentialRepositoryImpl(
         settings.saveR2Config(endpoint, NetworkConstants.REGION, credentials.jurisdiction)
         settings.raw().edit().putString(PrefKeys.ACCOUNT_ID, credentials.accountId).apply()
 
-        // 异步探测管理面：一次列桶，成功与否只影响高级设置页提示，不阻塞保存
         val auth = CfAuth(credentials.accountId, credentials.apiToken, credentials.jurisdiction)
-        scope.launch {
-            val ok = runCatching {
-                CloudflareClientImpl({ auth }, httpClient, ioDispatcher).listBuckets()
-            }.isSuccess
-            settings.setManagementApiAvailable(ok)
+        val buckets = discoverBuckets(auth)
+        val managementApiOk = !buckets.isNullOrEmpty()
+        if (buckets != null) {
+            val selectedBucket = selectAvailableBucket(settings.load().currentBucket, buckets)
+            settings.setCurrentBucket(selectedBucket)
         }
+        settings.setManagementApiAvailable(managementApiOk)
 
-        SaveResult(true, null, null)
+        SaveResult(true, managementApiOk, null)
     }
 
     override suspend fun clear() = withContext(ioDispatcher) {
@@ -97,9 +95,15 @@ class CredentialRepositoryImpl(
             return@withContext TestResult(false, incompleteError("testConnection"))
         }
         val current = settings.load()
-        val bucket = current.currentBucket
+        var bucket = current.currentBucket.trim()
+        val auth = CfAuth(credentials.accountId, credentials.apiToken, credentials.jurisdiction)
+        val buckets = discoverBuckets(auth)
+        if (buckets != null) {
+            bucket = selectAvailableBucket(bucket, buckets)
+            settings.setCurrentBucket(bucket)
+        }
         if (bucket.isBlank()) {
-            return@withContext TestResult(false, incompleteError("testConnection"))
+            return@withContext TestResult(false, bucketUnavailableError("testConnection"))
         }
         val endpoint = UrlUtils.buildEndpoint(credentials.accountId, current.endpoint)
         val config = S3Config(
@@ -132,13 +136,14 @@ class CredentialRepositoryImpl(
         }
         val current = settings.load()
         val endpoint = current.endpoint.ifBlank { UrlUtils.buildEndpoint(credentials.accountId) }
-        if (endpoint.isBlank() || current.currentBucket.isBlank()) {
+        val bucket = current.currentBucket.trim()
+        if (endpoint.isBlank() || bucket.isBlank()) {
             return null
         }
         return S3Config(
             endpoint = endpoint,
             region = current.region,
-            bucket = current.currentBucket,
+            bucket = bucket,
             accessKeyId = credentials.accessKeyId,
             secretAccessKey = credentials.secretAccessKey,
             jurisdiction = credentials.jurisdiction,
@@ -150,6 +155,33 @@ class CredentialRepositoryImpl(
         type = ErrorType.AUTH,
         messageResId = ErrorMapper.messageFor(ErrorType.AUTH),
         recovery = ErrorMapper.recoveryFor(ErrorType.AUTH),
+        operation = operation
+    )
+
+    /** 在限定时间内获取存储桶；超时返回空结果，外部取消继续向上传递。 */
+    private suspend fun discoverBuckets(auth: CfAuth): List<Bucket>? = try {
+        withTimeout(NetworkConstants.STARTUP_PROBE_TIMEOUT_MS) {
+            CloudflareClientImpl({ auth }, httpClient, ioDispatcher).listBuckets()
+        }
+    } catch (t: Throwable) {
+        if (t is CancellationException && t !is TimeoutCancellationException) {
+            throw t
+        }
+        null
+    }
+
+    /** 管理面列桶成功时保留有效当前桶，否则选择远端返回的第一个桶。 */
+    private fun selectAvailableBucket(currentBucket: String, buckets: List<Bucket>): String {
+        val normalizedCurrent = currentBucket.trim()
+        return buckets.firstOrNull { it.name == normalizedCurrent }?.name
+            ?: buckets.firstOrNull()?.name.orEmpty()
+    }
+
+    /** 管理面未返回存储桶时阻止发起指向虚构桶名的 S3 请求。 */
+    private fun bucketUnavailableError(operation: String): AppError = AppError(
+        type = ErrorType.BUCKET,
+        messageResId = R.string.error_bucket_not_selected,
+        recovery = ErrorMapper.recoveryFor(ErrorType.BUCKET),
         operation = operation
     )
 }

@@ -177,7 +177,7 @@ class StateView @JvmOverloads constructor(
     }
 
     /**
-     * 错误态。主文案取 [AppError.messageResId]；若为认证类补充 [ErrorMapper.authDetailFor] 详情；
+     * 错误态。主文案取 [AppError.messageResId]；详情由 [ErrorMapper] 统一生成；
      * 主动作文案优先取调用方 [primaryLabelRes]，否则按恢复动作映射 P1 通用文案。
      *
      * @param error 统一错误模型
@@ -195,8 +195,7 @@ class StateView @JvmOverloads constructor(
     ) {
         state = State.ERROR
         val title = context.getString(error.messageResId)
-        val detailRes = ErrorMapper.authDetailFor(error.type)
-        val desc = detailRes?.let { context.getString(it) }
+        val desc = ErrorMapper.detailFor(context, error)
         val labelRes = primaryLabelRes ?: defaultRecoveryLabel(error.recovery)
         renderState(
             iconRes = R.drawable.ic_info,

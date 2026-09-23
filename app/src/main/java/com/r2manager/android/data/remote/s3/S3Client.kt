@@ -270,14 +270,15 @@ class S3ClientImpl(
         delimiter: String?,
         continuationToken: String?
     ): S3RawPage = withContext(ioDispatcher) {
+        val requestPrefix = directoryPrefix(prefix)
         val request = factory.listObjectsV2(
-            prefix = prefix,
+            prefix = requestPrefix,
             delimiter = delimiter,
             continuationToken = continuationToken,
             maxKeys = NetworkConstants.LIST_MAX_KEYS
         )
         val response = ensureSuccess(call(request), "listObjectsRaw")
-        readBody(response).let { S3XmlParser.parseListObjectsV2(it, prefix) }
+        readBody(response).let { S3XmlParser.parseListObjectsV2(it, requestPrefix) }
     }
 
     override suspend fun listObjectsV2(
@@ -286,18 +287,19 @@ class S3ClientImpl(
         delimiter: String?,
         maxKeys: Int
     ): ObjectPage = withContext(ioDispatcher) {
-        val request = factory.listObjectsV2(prefix, delimiter, continuationToken, maxKeys)
+        val requestPrefix = directoryPrefix(prefix)
+        val request = factory.listObjectsV2(requestPrefix, delimiter, continuationToken, maxKeys)
         val response = ensureSuccess(call(request), "listObjectsV2")
-        val page = readBody(response).let { S3XmlParser.parseListObjectsV2(it, prefix) }
+        val page = readBody(response).let { S3XmlParser.parseListObjectsV2(it, requestPrefix) }
 
         // 文件夹（CommonPrefixes，保留出现顺序）在前，文件在后（与桌面版一致）。
         val folders = LinkedHashMap<String, ObjectInfo>()
         for (commonPrefix in page.commonPrefixes) {
-            folders[commonPrefix] = folderInfo(commonPrefix, prefix, null)
+            folders[commonPrefix] = folderInfo(commonPrefix, requestPrefix, null)
         }
         for (item in page.contents) {
             if (item.isFolder) {
-                folders[item.key] = folderInfo(item.key, prefix, item.lastModifiedIso)
+                folders[item.key] = folderInfo(item.key, requestPrefix, item.lastModifiedIso)
             }
         }
 
@@ -320,18 +322,19 @@ class S3ClientImpl(
     }
 
     override suspend fun latestLastModified(prefix: String): String? = withContext(ioDispatcher) {
+        val requestPrefix = directoryPrefix(prefix)
         var token: String? = null
         var latestMillis: Long = Long.MIN_VALUE
         var latestIso: String? = null
         do {
             val request = factory.listObjectsV2(
-                prefix = prefix,
+                prefix = requestPrefix,
                 delimiter = null,
                 continuationToken = token,
                 maxKeys = NetworkConstants.LIST_MAX_KEYS
             )
             val response = ensureSuccess(call(request), "latestLastModified")
-            val raw = readBody(response).let { S3XmlParser.parseListObjectsV2(it, prefix) }
+            val raw = readBody(response).let { S3XmlParser.parseListObjectsV2(it, requestPrefix) }
             for (item in raw.contents) {
                 val millis = S3XmlParser.isoToEpochMillis(item.lastModifiedIso) ?: continue
                 if (millis > latestMillis) {
@@ -356,6 +359,10 @@ class S3ClientImpl(
             etag = null
         )
     }
+
+    /** S3 目录查询必须使用带末尾 `/` 的前缀，根目录保持空串。 */
+    private fun directoryPrefix(prefix: String): String =
+        if (prefix.isEmpty() || prefix.endsWith('/')) prefix else "$prefix/"
 
     // ———————————————————— 元信息 / 预览 ————————————————————
 

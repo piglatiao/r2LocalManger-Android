@@ -194,6 +194,7 @@ class BrowserViewModel(container: AppContainer) : AppViewModel(container) {
                         fromCache = result.fromCache,
                         cachedAt = result.cachedAt,
                         offline = result.offline,
+                        unconfigured = !result.configured,
                         loading = false,
                         refreshing = false,
                         error = null

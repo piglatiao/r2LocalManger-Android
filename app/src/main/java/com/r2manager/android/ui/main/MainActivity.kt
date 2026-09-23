@@ -134,6 +134,11 @@ class MainActivity : AppCompatActivity() {
         applyNavSelection(index)
     }
 
+    /** 从文件页打开设置页，用于处理未配置凭证状态。 */
+    fun openSettingsTab() {
+        selectTab(MainTab.SETTINGS)
+    }
+
     /** 依据当前页序号刷新底部导航选中态（图标与文案着色）。 */
     private fun applyNavSelection(position: Int) {
         val selectedColor = ContextCompat.getColor(this, R.color.primary)

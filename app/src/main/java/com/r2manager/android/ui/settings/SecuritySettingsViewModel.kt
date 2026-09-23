@@ -20,6 +20,9 @@ class SecuritySettingsViewModel(private val container: AppContainer) : ViewModel
     /** 应用锁是否已启用。 */
     fun isLockEnabled(): Boolean = appLock.status().enabled
 
+    /** 是否已存在可校验的应用密码。 */
+    fun hasPassword(): Boolean = appLock.status().hasPassword
+
     /** 是否启用「优先生物识别」。 */
     fun isBiometricEnabled(): Boolean =
         container.settingsStore.raw().getBoolean(LockViewModel.KEY_BIOMETRIC_ENABLED, true)
@@ -44,7 +47,7 @@ class SecuritySettingsViewModel(private val container: AppContainer) : ViewModel
         appLock.setEnabled(currentPassword, enable)
 
     /** 修改密码。 */
-    suspend fun changePassword(current: String, newPassword: String): UnlockResult =
+    suspend fun changePassword(current: String?, newPassword: String): UnlockResult =
         appLock.changePassword(current, newPassword)
 
     /** 清除已保存凭证。 */

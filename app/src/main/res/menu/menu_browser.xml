@@ -12,13 +12,13 @@
     <item
         android:id="@+id/menu_toggle_view"
         android:icon="@drawable/ic_grid"
-        android:title="@string/action_more"
+        android:title="@string/action_toggle_view"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/menu_sort"
         android:icon="@drawable/ic_sort"
-        android:title="@string/action_more"
+        android:title="@string/action_filter_sort"
         app:showAsAction="never" />
 
     <item

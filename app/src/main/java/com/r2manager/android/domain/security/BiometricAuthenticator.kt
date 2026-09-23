@@ -19,20 +19,19 @@ import com.r2manager.android.core.error.RecoveryAction
  */
 class BiometricAuthenticator(private val activity: FragmentActivity) {
 
-    private val allowedAuthenticators: Int
-        get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+    private fun allowedAuthenticators(withCryptoObject: Boolean): Int =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !withCryptoObject) {
             BiometricManager.Authenticators.BIOMETRIC_STRONG or
                 BiometricManager.Authenticators.DEVICE_CREDENTIAL
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            BiometricManager.Authenticators.BIOMETRIC_STRONG
         } else {
             BiometricManager.Authenticators.BIOMETRIC_WEAK
         }
 
-    private val usesDeviceCredential: Boolean
-        get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
-
     /** 当前设备是否具备可用的生物识别（或 30+ 的设备凭证）能力。 */
-    fun canAuthenticate(): Boolean = try {
-        BiometricManager.from(activity).canAuthenticate(allowedAuthenticators) ==
+    fun canAuthenticate(withCryptoObject: Boolean = false): Boolean = try {
+        BiometricManager.from(activity).canAuthenticate(allowedAuthenticators(withCryptoObject)) ==
             BiometricManager.BIOMETRIC_SUCCESS
     } catch (t: Throwable) {
         false
@@ -40,14 +39,20 @@ class BiometricAuthenticator(private val activity: FragmentActivity) {
 
     /**
      * 唤起生物识别。
-     * @param onResult 成功传 `(true, null)`；失败/取消传 `(false, error?)`（用户主动取消时 error 为 null）。
+     * @param cryptoObject 可选的密钥操作对象；解锁缓存密钥时必须传入
+     * @param onResult 成功传 `(true, null, cryptoObject)`；失败/取消传 `(false, error?, null)`
      */
-    fun authenticate(title: String, subtitle: String, onResult: (Boolean, AppError?) -> Unit) {
+    fun authenticate(
+        title: String,
+        subtitle: String,
+        cryptoObject: BiometricPrompt.CryptoObject? = null,
+        onResult: (Boolean, AppError?, BiometricPrompt.CryptoObject?) -> Unit
+    ) {
         val executor = ContextCompat.getMainExecutor(activity)
 
         val callback = object : BiometricPrompt.AuthenticationCallback() {
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                onResult(true, null)
+                onResult(true, null, result.cryptoObject)
             }
 
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
@@ -65,7 +70,7 @@ class BiometricAuthenticator(private val activity: FragmentActivity) {
                         s3Code = errorCode.toString()
                     )
                 }
-                onResult(false, error)
+                onResult(false, error, null)
             }
 
             override fun onAuthenticationFailed() {
@@ -74,16 +79,21 @@ class BiometricAuthenticator(private val activity: FragmentActivity) {
         }
 
         val prompt = BiometricPrompt(activity, executor, callback)
+        val usesDeviceCredential = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && cryptoObject == null
         val builder = BiometricPrompt.PromptInfo.Builder()
             .setTitle(title)
             .setSubtitle(subtitle)
-            .setAllowedAuthenticators(allowedAuthenticators)
+            .setAllowedAuthenticators(allowedAuthenticators(cryptoObject != null))
 
         if (!usesDeviceCredential) {
             // 未启用设备凭证时，必须提供取消按钮文案
             builder.setNegativeButtonText("取消")
         }
 
-        prompt.authenticate(builder.build())
+        if (cryptoObject == null) {
+            prompt.authenticate(builder.build())
+        } else {
+            prompt.authenticate(builder.build(), cryptoObject)
+        }
     }
 }

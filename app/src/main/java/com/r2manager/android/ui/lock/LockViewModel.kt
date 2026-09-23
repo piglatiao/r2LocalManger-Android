@@ -8,6 +8,7 @@ import com.r2manager.android.domain.security.AppLockManager
 import com.r2manager.android.domain.security.KeyManager
 import com.r2manager.android.domain.security.UnlockResult
 import com.r2manager.android.data.local.prefs.SettingsStore
+import javax.crypto.Cipher
 
 /**
  * 应用锁解锁 ViewModel（P4-B）。
@@ -33,6 +34,9 @@ class LockViewModel(private val container: AppContainer) : ViewModel() {
     /** 是否已登记生物识别绑定密钥（冷启动下生物识别成功后可由 Keystore 私钥还原会话密钥）。 */
     fun hasBiometricKey(): Boolean = keyManager.hasBiometricKey()
 
+    /** 创建绑定生物识别授权的解密 Cipher。 */
+    fun prepareBiometricCipher(): Cipher? = keyManager.prepareBiometricCipher()
+
     /** 是否启用「优先生物识别」。 */
     fun isBiometricEnabled(): Boolean = settings.raw().getBoolean(KEY_BIOMETRIC_ENABLED, true)
 
@@ -55,7 +59,7 @@ class LockViewModel(private val container: AppContainer) : ViewModel() {
      *
      * @return 成功则 [UnlockResult.success]=true；失败应回退 PIN 兜底通道
      */
-    suspend fun unlockByBiometric(): UnlockResult = appLock.unlockByBiometric()
+    suspend fun unlockByBiometric(cipher: Cipher): UnlockResult = appLock.unlockByBiometric(cipher)
 
     /** 「暂不设置密码」，之后不再提示初始化。 */
     fun dismissSetup() = appLock.dismissSetup()

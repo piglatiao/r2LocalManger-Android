@@ -36,6 +36,8 @@ data class BrowserUiState(
     val loadingMore: Boolean = false,
     /** 离线（无网络且展示缓存/无缓存）。 */
     val offline: Boolean = false,
+    /** 未配置凭证或存储桶。 */
+    val unconfigured: Boolean = false,
     /** 当前数据来自缓存。 */
     val fromCache: Boolean = false,
     /** 缓存时间（来自缓存时有效）。 */
@@ -84,7 +86,7 @@ data class BrowserUiState(
 
     /** 是否「空目录」（无任何对象，且非搜索 / 筛选态）。 */
     val isEmptyDirectory: Boolean
-        get() = !isLoading && error == null && objects.isEmpty()
+        get() = !isLoading && error == null && !unconfigured && objects.isEmpty()
 
     /** 是否「无匹配结果」（有对象但被搜索 / 筛选清空）。 */
     val isNoResult: Boolean
@@ -92,7 +94,7 @@ data class BrowserUiState(
 
     /** 是否处于「离线且无缓存」。 */
     val isOfflineEmpty: Boolean
-        get() = !isLoading && error == null && offline && objects.isEmpty()
+        get() = !isLoading && error == null && !unconfigured && offline && objects.isEmpty()
 
     private fun matchesFilter(info: ObjectInfo): Boolean = when (filter) {
         FileFilter.ALL -> true

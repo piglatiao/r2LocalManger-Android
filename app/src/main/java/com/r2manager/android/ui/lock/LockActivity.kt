@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.r2manager.android.R
@@ -140,7 +141,9 @@ class LockActivity : AppCompatActivity() {
     }
 
     private fun biometricCell(): View {
-        val usable = viewModel.isBiometricEnabled() && biometric.canAuthenticate()
+        val usable = viewModel.isBiometricEnabled() && biometric.canAuthenticate(
+            withCryptoObject = !viewModel.hasSessionKey()
+        )
         val image = ImageView(this).apply {
             setImageResource(R.drawable.ic_lock)
             imageTintList = android.content.res.ColorStateList.valueOf(
@@ -245,23 +248,34 @@ class LockActivity : AppCompatActivity() {
     private fun maybeAutoPromptBiometric() {
         // 冷启动 / 软上锁：只要已登记生物识别绑定、或仍持有会话密钥，就自动唤起 BiometricPrompt（PRD R-03）。
         val canUnlock = viewModel.hasBiometricKey() || viewModel.hasSessionKey()
-        if (viewModel.isBiometricEnabled() && biometric.canAuthenticate() && canUnlock) {
+        if (viewModel.isBiometricEnabled() && canUnlock) {
             startBiometric()
         }
     }
 
     private fun startBiometric() {
-        if (!viewModel.isBiometricEnabled() || !biometric.canAuthenticate()) {
+        if (!viewModel.isBiometricEnabled()) {
+            showError(getString(R.string.lock_biometric_unavailable))
+            return
+        }
+        val hasSessionKey = viewModel.hasSessionKey()
+        val cipher = if (hasSessionKey) null else viewModel.prepareBiometricCipher()
+        if (!hasSessionKey && cipher == null) {
+            showError(getString(R.string.lock_biometric_need_password))
+            return
+        }
+        if (!biometric.canAuthenticate(withCryptoObject = cipher != null)) {
             showError(getString(R.string.lock_biometric_unavailable))
             return
         }
         biometric.authenticate(
             getString(R.string.lock_biometric_prompt_title),
-            getString(R.string.lock_biometric_prompt_sub)
-        ) { ok, error ->
+            getString(R.string.lock_biometric_prompt_sub),
+            cryptoObject = cipher?.let { BiometricPrompt.CryptoObject(it) }
+        ) { ok, error, cryptoObject ->
             if (isFinishing || isDestroyed) return@authenticate
             when {
-                ok -> onBiometricSuccess()
+                ok -> onBiometricSuccess(cryptoObject)
                 error != null -> showError(getString(R.string.lock_biometric_unavailable))
                 // 用户主动取消：静默，保留 PIN 通道
             }
@@ -276,13 +290,18 @@ class LockActivity : AppCompatActivity() {
      *   用生物识别绑定的 Keystore 私钥还原会话密钥（PRD R-03）；还原失败（未登记 / 绑定失效）则
      *   留在本页提示改用密码，PIN 兜底通道始终可用。
      */
-    private fun onBiometricSuccess() {
+    private fun onBiometricSuccess(cryptoObject: BiometricPrompt.CryptoObject?) {
         if (viewModel.hasSessionKey()) {
             onUnlocked()
             return
         }
+        val cipher = cryptoObject?.cipher
+        if (cipher == null) {
+            showError(getString(R.string.lock_biometric_need_password))
+            return
+        }
         lifecycleScope.launch {
-            val result = viewModel.unlockByBiometric()
+            val result = viewModel.unlockByBiometric(cipher)
             if (result.success) {
                 onUnlocked()
             } else {

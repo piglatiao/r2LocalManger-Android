@@ -9,7 +9,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.time.Clock
 
 /**
- * 构造并签名 S3 请求（path-style：`/<bucket>/<key>`）。
+ * 构造并签名 S3 请求（virtual-hosted-style：`<bucket>.<endpoint>/<key>`）。
  *
  * 关键点：实际请求 URL 的路径与查询串**复用** [SigV4Signer.canonicalUri] / [SigV4Signer.canonicalQueryString]，
  * 保证「被签名的字符串」与「实际发出的 URL」逐字一致，避免 `SignatureDoesNotMatch`。
@@ -27,12 +27,17 @@ class S3RequestFactory(
         ?.toHttpUrlOrNull()
         ?: throw IllegalArgumentException("S3 端点无效: '${config.endpoint}'")
 
+    /** 与桌面端 AWS SDK 默认行为一致，把桶名放入 R2 端点主机名。 */
+    private val requestBaseUrl: HttpUrl = baseUrl.newBuilder()
+        .host("${config.bucket.trim()}.${baseUrl.host}")
+        .build()
+
     private val host: String = buildString {
-        append(baseUrl.host)
-        val defaultPort = if (baseUrl.isHttps) 443 else 80
-        if (baseUrl.port != defaultPort) {
+        append(requestBaseUrl.host)
+        val defaultPort = if (requestBaseUrl.isHttps) 443 else 80
+        if (requestBaseUrl.port != defaultPort) {
             append(':')
-            append(baseUrl.port)
+            append(requestBaseUrl.port)
         }
     }
 
@@ -40,7 +45,7 @@ class S3RequestFactory(
 
     // ———————————————————— 对外构建器 ————————————————————
 
-    /** `GET /<bucket>?list-type=2&prefix=&delimiter=&...` */
+    /** `GET /?list-type=2&prefix=&delimiter=&...`，桶名位于 Host。 */
     fun listObjectsV2(
         prefix: String,
         delimiter: String?,
@@ -60,23 +65,23 @@ class S3RequestFactory(
         return build("GET", bucketPath(), query, null, emptySha256, null)
     }
 
-    /** `HEAD /<bucket>/<key>` */
+    /** `HEAD /<key>`，桶名位于 Host。 */
     fun headObject(key: String): Request =
         build("HEAD", objectPath(key), emptyMap(), null, emptySha256, null)
 
-    /** `GET /<bucket>/<key>` */
+    /** `GET /<key>`，桶名位于 Host。 */
     fun getObject(key: String): Request =
         build("GET", objectPath(key), emptyMap(), null, emptySha256, null)
 
-    /** `DELETE /<bucket>/<key>` */
+    /** `DELETE /<key>`，桶名位于 Host。 */
     fun deleteObject(key: String): Request =
         build("DELETE", objectPath(key), emptyMap(), null, emptySha256, null)
 
-    /** `PUT /<bucket>/<key>`（流式，UNSIGNED-PAYLOAD） */
+    /** `PUT /<key>`（流式，UNSIGNED-PAYLOAD）。 */
     fun putObject(key: String, body: RequestBody): Request =
         build("PUT", objectPath(key), emptyMap(), body, SigV4Signer.UNSIGNED_PAYLOAD, body.contentType()?.toString())
 
-    /** `POST /<bucket>/<key>?uploads` */
+    /** `POST /<key>?uploads`。 */
     fun createMultipartUpload(key: String, contentType: String): Request =
         build(
             method = "POST",
@@ -87,7 +92,7 @@ class S3RequestFactory(
             contentType = contentType
         )
 
-    /** `PUT /<bucket>/<key>?partNumber=N&uploadId=...` */
+    /** `PUT /<key>?partNumber=N&uploadId=...`。 */
     fun uploadPart(key: String, uploadId: String, partNumber: Int, body: RequestBody): Request =
         build(
             method = "PUT",
@@ -98,7 +103,7 @@ class S3RequestFactory(
             contentType = null
         )
 
-    /** `POST /<bucket>/<key>?uploadId=...`（XML 体，签名真实 SHA-256） */
+    /** `POST /<key>?uploadId=...`（XML 体，签名真实 SHA-256）。 */
     fun completeMultipartUpload(key: String, uploadId: String, xml: String): Request =
         build(
             method = "POST",
@@ -109,7 +114,7 @@ class S3RequestFactory(
             contentType = XML_CONTENT_TYPE
         )
 
-    /** `DELETE /<bucket>/<key>?uploadId=...` */
+    /** `DELETE /<key>?uploadId=...`。 */
     fun abortMultipartUpload(key: String, uploadId: String): Request =
         build(
             method = "DELETE",
@@ -120,7 +125,7 @@ class S3RequestFactory(
             contentType = null
         )
 
-    /** `POST /<bucket>?delete`（XML 体，签名真实 SHA-256） */
+    /** `POST /?delete`（XML 体，签名真实 SHA-256）。 */
     fun deleteObjects(xml: String): Request =
         build(
             method = "POST",
@@ -133,10 +138,10 @@ class S3RequestFactory(
 
     // ———————————————————— 内部 ————————————————————
 
-    private fun bucketPath(): String = "/${config.bucket}"
+    private fun bucketPath(): String = "/"
 
     private fun objectPath(key: String): String =
-        if (key.isEmpty()) bucketPath() else "/${config.bucket}/$key"
+        if (key.isEmpty()) bucketPath() else "/$key"
 
     private fun build(
         method: String,
@@ -149,7 +154,7 @@ class S3RequestFactory(
         val canonicalUri = SigV4Signer.canonicalUri(rawPath)
         val canonicalQuery = SigV4Signer.canonicalQueryString(query)
 
-        val urlBuilder = baseUrl.newBuilder().encodedPath(canonicalUri)
+        val urlBuilder = requestBaseUrl.newBuilder().encodedPath(canonicalUri)
         if (canonicalQuery.isNotEmpty()) {
             urlBuilder.encodedQuery(canonicalQuery)
         }

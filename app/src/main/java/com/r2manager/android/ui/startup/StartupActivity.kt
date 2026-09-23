@@ -16,6 +16,7 @@ import com.r2manager.android.databinding.ActivityStartupBinding
 import com.r2manager.android.ui.common.ViewModelFactory
 import com.r2manager.android.ui.common.applyStatusBarPadding
 import com.r2manager.android.ui.lock.LockActivity
+import com.r2manager.android.ui.lock.LockSetupActivity
 import com.r2manager.android.ui.main.MainActivity
 import kotlinx.coroutines.launch
 
@@ -45,6 +46,9 @@ class StartupActivity : AppCompatActivity() {
     /** 是否已向解锁页发起请求（避免状态重入时重复 launch）。 */
     private var unlockRequested = false
 
+    /** 是否已向首次密码引导页发起请求。 */
+    private var passwordSetupRequested = false
+
     /**
      * 解锁页结果回调：`RESULT_OK` → 跳过 bootstrap 续跑凭证校验与分流；否则用户放弃解锁 → 退出。
      *
@@ -60,6 +64,17 @@ class StartupActivity : AppCompatActivity() {
         } else {
             finish()
         }
+    }
+
+    /** 首次密码引导结果：设置成功或跳过后都继续进入正常分流。 */
+    private val passwordSetupLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode != RESULT_OK) {
+            viewModel.dismissPasswordSetup()
+        }
+        navigated = false
+        viewModel.continueAfterPasswordSetup()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,6 +112,13 @@ class StartupActivity : AppCompatActivity() {
                 if (!unlockRequested) {
                     unlockRequested = true
                     lockLauncher.launch(buildLockIntent())
+                }
+            }
+
+            StartupUiState.NeedsPasswordSetup -> {
+                if (!passwordSetupRequested) {
+                    passwordSetupRequested = true
+                    passwordSetupLauncher.launch(Intent(this, LockSetupActivity::class.java))
                 }
             }
 

@@ -12,7 +12,7 @@ import javax.crypto.spec.SecretKeySpec
  *
  * @param method HTTP 方法（GET/PUT/POST/HEAD/DELETE）
  * @param host 请求 Host（不含协议与路径）
- * @param rawPath 未编码的路径，含桶名，如 `/mybucket/dir/a b.txt`
+ * @param rawPath 未编码的请求路径，桶名已位于 Host，如 `/dir/a b.txt`
  * @param queryParams 查询参数（未编码）；同名多值请合并为逗号分隔
  * @param headers 需要参与签名的额外请求头（键不区分大小写；`host`/`x-amz-*` 由签名器自动补齐）
  * @param payloadHash 载荷 SHA-256 十六进制；流式上传用 [SigV4Signer.UNSIGNED_PAYLOAD]
@@ -52,6 +52,7 @@ object SigV4Signer {
     private val DATE_STAMP_FORMAT: DateTimeFormatter =
         DateTimeFormatter.ofPattern("yyyyMMdd").withZone(ZoneOffset.UTC)
 
+    private val URI_HEX = "0123456789ABCDEF".toCharArray()
     private val HEX = "0123456789abcdef".toCharArray()
 
     /**
@@ -177,8 +178,8 @@ object SigV4Signer {
             } else {
                 sb.append('%')
                 val code = byte.toInt() and 0xFF
-                sb.append(HEX[code ushr 4])
-                sb.append(HEX[code and 0x0F])
+                sb.append(URI_HEX[code ushr 4])
+                sb.append(URI_HEX[code and 0x0F])
             }
         }
         return sb.toString()

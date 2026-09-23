@@ -21,6 +21,9 @@ sealed interface StartupUiState {
     /** 需要解锁（已启用应用锁且未持钥）→ 启动 `LockActivity`。 */
     data object RequiresLock : StartupUiState
 
+    /** 首次启动密码引导（可跳过，不阻塞进入应用）。 */
+    data object NeedsPasswordSetup : StartupUiState
+
     /** 凭证缺失 / 不完整 / 未选桶 → 引导至凭证配置（不发起网络请求，R-01）。 */
     data object MissingCredentials : StartupUiState
 
@@ -36,8 +39,9 @@ sealed interface StartupUiState {
  *
  * 流程：
  * 1. [AppContainer.appLockManager].bootstrap() —— 已启用锁则保持 locked，未启用则准备回退密钥；
- * 2. 读取凭证：缺失 / 不完整 / 未选桶 → [StartupUiState.MissingCredentials]（不发网络请求）；
- * 3. 否则 [StartupUiState.Ready]（后台静默探测由凭证保存链路负责，不阻塞启动）。
+ * 2. 首次启动先展示可跳过的密码引导；
+ * 3. 读取凭证：缺失 / 不完整 / 未选桶 → [StartupUiState.MissingCredentials]（不发网络请求）；
+ * 4. 否则 [StartupUiState.Ready]（后台静默探测由凭证保存链路负责，不阻塞启动）。
  *
  * @param container 依赖容器
  */
@@ -71,6 +75,10 @@ class StartupViewModel(container: AppContainer) : AppViewModel(container) {
                 _state.value = StartupUiState.RequiresLock
                 return@launch
             }
+            if (bootstrap.getOrThrow().needsSetup) {
+                _state.value = StartupUiState.NeedsPasswordSetup
+                return@launch
+            }
             routeByCredentials()
         }
     }
@@ -87,6 +95,17 @@ class StartupViewModel(container: AppContainer) : AppViewModel(container) {
             routeByCredentials()
         }
     }
+
+    /** 首次密码引导结束后继续分流，不重复执行 bootstrap。 */
+    fun continueAfterPasswordSetup() {
+        appScope.launch {
+            _state.value = StartupUiState.Checking
+            routeByCredentials()
+        }
+    }
+
+    /** 用户跳过首次密码引导后记录选择，避免下次启动重复提示。 */
+    fun dismissPasswordSetup() = container.appLockManager.dismissSetup()
 
     /**
      * 凭证校验 → 分流（不发网络请求，R-01）：

@@ -24,6 +24,7 @@ import kotlinx.coroutines.withContext
  */
 interface SettingsRepository {
     fun settings(): StateFlow<AppSettings>
+    suspend fun refresh()
     suspend fun updateR2Config(accountId: String, jurisdiction: String)
     suspend fun setThumbnailCache(enabled: Boolean, maxBytes: Long)
     suspend fun setObjectListCacheEnabled(enabled: Boolean)
@@ -57,6 +58,11 @@ class SettingsRepositoryImpl(
 
     override fun settings(): StateFlow<AppSettings> = state.asStateFlow()
 
+    /** 刷新由其他仓库直接写入的设置，保持状态流与持久化值一致。 */
+    override suspend fun refresh() = withContext(ioDispatcher) {
+        refreshState()
+    }
+
     override suspend fun updateR2Config(accountId: String, jurisdiction: String) =
         withContext(ioDispatcher) {
             val current = state.value
@@ -67,30 +73,30 @@ class SettingsRepositoryImpl(
             }
             store.saveR2Config(endpoint, NetworkConstants.REGION, jurisdiction)
             store.raw().edit().putString(PrefKeys.ACCOUNT_ID, accountId).apply()
-            refresh()
+            refreshState()
         }
 
     override suspend fun setThumbnailCache(enabled: Boolean, maxBytes: Long) =
         withContext(ioDispatcher) {
             store.setThumbnailCache(enabled, maxBytes)
             thumbnailCache.configure(enabled, maxBytes)
-            refresh()
+            refreshState()
         }
 
     override suspend fun setObjectListCacheEnabled(enabled: Boolean) = withContext(ioDispatcher) {
         store.setObjectListCacheEnabled(enabled)
         listCache.configure(enabled)
-        refresh()
+        refreshState()
     }
 
     override suspend fun setAutoLockMinutes(minutes: Int) = withContext(ioDispatcher) {
         store.setAutoLockMinutes(minutes)
-        refresh()
+        refreshState()
     }
 
     override suspend fun setLastCopyFormat(format: CopyFormat) = withContext(ioDispatcher) {
         store.setLastCopyFormat(format)
-        refresh()
+        refreshState()
     }
 
     override suspend fun cacheStats(): Pair<ThumbnailCacheStats, ListCacheStats> =
@@ -104,7 +110,7 @@ class SettingsRepositoryImpl(
 
     override suspend fun cacheDirectory(): String = cacheRootDir.absolutePath
 
-    private fun refresh() {
+    private fun refreshState() {
         state.value = store.load()
     }
 }

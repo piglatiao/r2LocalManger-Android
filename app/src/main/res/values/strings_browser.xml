@@ -20,6 +20,9 @@
     <string name="browser_no_result_desc">试试更换关键词或清除筛选条件。</string>
     <string name="browser_clear_filter">清除筛选</string>
     <string name="browser_offline_desc">无网络连接，且本地暂无缓存。</string>
+    <string name="browser_config_required">尚未配置存储连接</string>
+    <string name="browser_config_required_desc">请先填写 R2 凭证并确认存储桶，然后再浏览文件。</string>
+    <string name="browser_open_settings">去设置</string>
 
     <!-- ===== 列表项动作 ===== -->
     <string name="browser_action_open">打开</string>

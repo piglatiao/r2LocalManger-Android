@@ -10,7 +10,10 @@
     <string name="error_network">网络连接失败，请检查网络设置</string>
     <string name="error_auth">认证失败，请检查 API 凭证配置</string>
     <string name="error_auth_detail">请先在“设置 &gt; 凭证配置”中填写 R2 凭证，并在“存储桶设置”中确认连接参数</string>
+    <string name="error_s3_code">S3 错误码：%1$s</string>
+    <string name="error_http_status">HTTP 状态码：%1$d</string>
     <string name="error_bucket">存储桶不存在或无法访问</string>
+    <string name="error_bucket_not_selected">未获取到存储桶，请确认 API Token 具有 R2 存储桶读取权限</string>
     <string name="error_object">对象不存在，可能已被删除</string>
     <string name="error_permission">权限不足，无法执行此操作</string>
     <string name="error_file_not_found">文件或目录不存在</string>

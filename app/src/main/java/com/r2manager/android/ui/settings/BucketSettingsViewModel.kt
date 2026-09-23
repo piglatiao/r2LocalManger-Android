@@ -23,9 +23,13 @@ class BucketSettingsViewModel(private val container: AppContainer) : ViewModel()
     /** 当前桶名。 */
     fun currentBucket(): String = container.settingsRepository.settings().value.currentBucket
 
-    /** 列出账号下全部桶。 */
+    /** 列出账号下全部桶；当前桶为空时默认选中返回列表的第一个。 */
     suspend fun listBuckets(): List<Bucket> {
         buckets = repo.listBuckets()
+        if (buckets.isNotEmpty() && currentBucket().isBlank()) {
+            repo.switchBucket(buckets.first().name)
+            container.settingsRepository.refresh()
+        }
         return buckets
     }
 

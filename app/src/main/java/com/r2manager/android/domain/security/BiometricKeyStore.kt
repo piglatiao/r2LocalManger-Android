@@ -6,6 +6,7 @@ import android.security.keystore.KeyPermanentlyInvalidatedException
 import android.security.keystore.KeyProperties
 import android.util.Base64
 import android.util.Log
+import androidx.biometric.BiometricPrompt
 import java.security.KeyPairGenerator
 import java.security.KeyStore
 import java.security.PrivateKey
@@ -17,12 +18,12 @@ import javax.crypto.Cipher
  *
  * ## 背景 / 缺陷
  * 会话密钥由密码经 PBKDF2 派生并仅存于 [KeyManager] 内存；冷启动（[AppLockManager.bootstrap]）
- * 会 `clearKey()` 保持 locked。而 `BiometricAuthenticator` 仅返回「是否通过」布尔值、且**不携带
- * 任何密钥材料**，故冷启动下生物识别成功后 UI 拿不到会话密钥（只能提示改用密码），
- * 违反 PRD R-03「冷启动自动唤起 BiometricPrompt，解锁成功后进入文件列表」。本类即为其修复：
+ * 会 `clearKey()` 保持 locked。若生物识别认证没有绑定实际的解密操作，即使系统回调成功，
+ * Keystore 仍会拒绝后续私钥解密，UI 只能提示改用密码，违反 PRD R-03「冷启动自动唤起
+ * BiometricPrompt，解锁成功后进入文件列表」。本类即为其修复：
  * 让生物识别成功后**能够**还原会话密钥。
  *
- * ## 方案（非对称 + 时效授权，跨 API 26+ 一致，无需 CryptoObject）
+ * ## 方案（非对称 + CryptoObject 授权，跨 API 26+ 一致）
  * - 生成 **RSA 密钥对**（别名 [ALIAS]），私钥 `setUserAuthenticationRequired(true)` 且有效期
  *   [VALIDITY_SECONDS]：
  *   **加密走公钥（无需认证）**，**解密走私钥（需先通过一次生物识别）**；因此登记（设置密码）时
@@ -49,28 +50,28 @@ class BiometricKeyStore {
     }.onFailure { Log.w(TAG, "生物识别密钥加密失败", it) }.getOrNull()
 
     /**
-     * 用私钥解密（**需已通过一次生物识别**）。
+     * 创建绑定 Keystore 私钥的解密 Cipher，供 [BiometricPrompt.CryptoObject] 使用。
+     *
+     * @return 已初始化的 Cipher；密钥不存在或已失效时返回 null
+     */
+    fun createDecryptCipher(): Cipher? = runCatching {
+        val privateKey = existingPrivateKey() ?: return@runCatching null
+        Cipher.getInstance(TRANSFORMATION).apply {
+            init(Cipher.DECRYPT_MODE, privateKey)
+        }
+    }.onFailure { t -> handleFailure(t) }.getOrNull()
+
+    /**
+     * 使用已通过生物识别授权的 Cipher 解密会话密钥。
      *
      * @param encoded [encrypt] 产出的 base64 密文
-     * @return 明文；若未认证 / 密钥失效 / 数据损坏则返回 null
+     * @param cipher 由 [BiometricPrompt.AuthenticationResult] 返回的 Cipher
+     * @return 明文；认证未绑定、密钥失效或数据损坏时返回 null
      */
-    fun decrypt(encoded: String): ByteArray? = runCatching {
+    fun decrypt(encoded: String, cipher: Cipher): ByteArray? = runCatching {
         val encrypted = Base64.decode(encoded, Base64.NO_WRAP)
-        val privateKey = existingPrivateKey() ?: return@runCatching null
-        val cipher = Cipher.getInstance(TRANSFORMATION)
-        cipher.init(Cipher.DECRYPT_MODE, privateKey)
         cipher.doFinal(encrypted)
-    }.onFailure { t ->
-        val invalidated = t is KeyPermanentlyInvalidatedException ||
-            t.cause is KeyPermanentlyInvalidatedException
-        if (invalidated) {
-            Log.w(TAG, "生物识别密钥已失效（可能重录了指纹/人脸），清理密钥对", t)
-            deleteKey()
-        } else {
-            // 未认证（UserNotAuthenticatedException）等属预期分支：返回 null 交由调用方回退密码
-            Log.w(TAG, "生物识别密钥解密失败，回退密码通道", t)
-        }
-    }.getOrNull()
+    }.onFailure { t -> handleFailure(t) }.getOrNull()
 
     /** 删除 Keystore 密钥对（关闭应用锁 / 密钥失效时调用）。 */
     fun deleteKey() {
@@ -95,6 +96,18 @@ class BiometricKeyStore {
         val store = keyStore()
         if (!store.containsAlias(ALIAS)) return null
         return runCatching { store.getKey(ALIAS, null) as? PrivateKey }.getOrNull()
+    }
+
+    /** 统一处理 Keystore 失效和解密失败，失败由上层回退到密码通道。 */
+    private fun handleFailure(t: Throwable) {
+        val invalidated = t is KeyPermanentlyInvalidatedException ||
+            t.cause is KeyPermanentlyInvalidatedException
+        if (invalidated) {
+            Log.w(TAG, "生物识别密钥已失效（可能重录了指纹/人脸），清理密钥对", t)
+            deleteKey()
+        } else {
+            Log.w(TAG, "生物识别密钥解密失败，回退密码通道", t)
+        }
     }
 
     private fun ensureKeyPair() {

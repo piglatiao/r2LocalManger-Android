@@ -23,6 +23,8 @@
     <string name="action_refresh">刷新</string>
     <string name="action_search">搜索</string>
     <string name="action_more">更多</string>
+    <string name="action_toggle_view">切换视图</string>
+    <string name="action_filter_sort">排序/筛选</string>
     <string name="action_select_all">全选</string>
     <string name="action_clear">清空</string>
     <string name="action_view_logs">查看日志</string>

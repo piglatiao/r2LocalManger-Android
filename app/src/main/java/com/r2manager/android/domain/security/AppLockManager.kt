@@ -10,6 +10,7 @@ import com.r2manager.android.core.error.ErrorType
 import com.r2manager.android.core.error.RecoveryAction
 import com.r2manager.android.data.local.prefs.SettingsStore
 import com.r2manager.android.domain.model.AppLockStatus
+import javax.crypto.Cipher
 
 /** 解锁/设置结果。 */
 data class UnlockResult(
@@ -104,8 +105,8 @@ class AppLockManager(
      *
      * @return 成功（已还原并装载会话密钥）返回 [UnlockResult.success]=true
      */
-    suspend fun unlockByBiometric(): UnlockResult {
-        return if (keyManager.unlockWithBiometric()) {
+    suspend fun unlockByBiometric(cipher: Cipher): UnlockResult {
+        return if (keyManager.unlockWithBiometric(cipher)) {
             attempts.reset()
             UnlockResult(true)
         } else {
@@ -123,14 +124,16 @@ class AppLockManager(
         attempts.reset()
     }
 
-    /** 修改密码（需原密码）。 */
-    suspend fun changePassword(current: String, newPassword: String): UnlockResult {
+    /** 修改密码；尚未设置密码时允许直接设置并启用应用锁。 */
+    suspend fun changePassword(current: String?, newPassword: String): UnlockResult {
         if (attempts.isLockedOut() > 0L) {
             return UnlockResult(false, authError(), attempts.isLockedOut())
         }
-        if (!matches(current)) {
-            val lockout = attempts.recordFailure()
-            return UnlockResult(false, authError(), lockout)
+        if (hasStoredPassword()) {
+            if (current.isNullOrEmpty() || !matches(current)) {
+                val lockout = attempts.recordFailure()
+                return UnlockResult(false, authError(), lockout)
+            }
         }
         if (newPassword.length < TransferConstants.MIN_PASSWORD_LENGTH) {
             return UnlockResult(false, policyError())

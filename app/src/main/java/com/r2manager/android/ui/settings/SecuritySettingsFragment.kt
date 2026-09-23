@@ -63,11 +63,21 @@ class SecuritySettingsFragment : Fragment() {
         binding.switchLock.isChecked = viewModel.isLockEnabled()
         binding.switchBiometric.isChecked = viewModel.isBiometricEnabled()
 
-        val biometricAvailable = BiometricAuthenticator(requireActivity()).canAuthenticate()
+        val biometricAvailable = BiometricAuthenticator(requireActivity()).canAuthenticate(withCryptoObject = true)
         binding.switchBiometric.isEnabled = viewModel.isLockEnabled() && biometricAvailable
         bindingFlags = false
 
+        updatePasswordFields()
         updateAutoLockSub()
+    }
+
+    /** 无旧密码时隐藏当前密码输入，并将按钮切换为直接设置密码。 */
+    private fun updatePasswordFields() {
+        val hasPassword = viewModel.hasPassword()
+        binding.layoutCurrent.visibility = if (hasPassword) View.VISIBLE else View.GONE
+        binding.btnChange.setText(
+            if (hasPassword) R.string.security_change else R.string.security_set_password
+        )
     }
 
     private fun updateAutoLockSub() {
@@ -163,9 +173,10 @@ class SecuritySettingsFragment : Fragment() {
     private fun syncLockUi() {
         bindingFlags = true
         binding.switchLock.isChecked = viewModel.isLockEnabled()
-        val biometricAvailable = BiometricAuthenticator(requireActivity()).canAuthenticate()
+        val biometricAvailable = BiometricAuthenticator(requireActivity()).canAuthenticate(withCryptoObject = true)
         binding.switchBiometric.isEnabled = viewModel.isLockEnabled() && biometricAvailable
         bindingFlags = false
+        updatePasswordFields()
     }
 
     // ==================== 生物识别 ====================
@@ -210,7 +221,7 @@ class SecuritySettingsFragment : Fragment() {
         val newPassword = binding.etNew.text?.toString().orEmpty()
         val confirm = binding.etConfirm.text?.toString().orEmpty()
 
-        if (current.isEmpty()) {
+        if (viewModel.hasPassword() && current.isEmpty()) {
             toast(R.string.security_error_need_current)
             return
         }
@@ -223,14 +234,22 @@ class SecuritySettingsFragment : Fragment() {
             return
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            val result = viewModel.changePassword(current, newPassword)
-            if (result.success) {
-                clearPasswordFields()
-                toast(R.string.security_password_changed)
-            } else {
-                toast(R.string.security_error_current)
+        val submitChange: () -> Unit = {
+            viewLifecycleOwner.lifecycleScope.launch {
+                val result = viewModel.changePassword(current.takeIf { viewModel.hasPassword() }, newPassword)
+                if (result.success) {
+                    clearPasswordFields()
+                    syncLockUi()
+                    toast(R.string.security_password_changed)
+                } else {
+                    toast(R.string.security_error_current)
+                }
             }
+        }
+        if (viewModel.hasPassword()) {
+            submitChange()
+        } else {
+            confirmCacheWipe(submitChange)
         }
     }
 

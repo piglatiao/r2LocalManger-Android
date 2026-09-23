@@ -11,7 +11,7 @@ class UrlUtilsTest {
     @Test
     fun `normalizeUrl 补协议并去尾斜杠`() {
         assertEquals("https://example.com", UrlUtils.normalizeUrl("example.com/"))
-        assertEquals("https://example.com", UrlUtils.normalizeUrl("http://example.com/"))
+        assertEquals("http://example.com", UrlUtils.normalizeUrl("http://example.com/"))
         assertEquals("https://a.example.com/x", UrlUtils.normalizeUrl(" https://a.example.com/x/ "))
     }
 

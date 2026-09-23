@@ -1,7 +1,5 @@
 package com.r2manager.android.ui.settings
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -10,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -19,9 +16,10 @@ import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.r2manager.android.R
 import com.r2manager.android.appContainer
 import com.r2manager.android.core.constants.NetworkConstants
+import com.r2manager.android.core.error.AppError
+import com.r2manager.android.core.error.ErrorMapper
 import com.r2manager.android.databinding.FragmentCredentialsBinding
 import com.r2manager.android.domain.model.Credentials
-import com.r2manager.android.ui.lock.LockSetupActivity
 import kotlinx.coroutines.launch
 
 /**
@@ -37,19 +35,6 @@ class CredentialsFragment : Fragment() {
 
     private val viewModel: CredentialsViewModel by viewModels {
         CredentialsViewModel.factory(requireContext().appContainer())
-    }
-
-    /**
-     * 首次设置密码引导结果（原型第 5 屏 `lock-setup`）。
-     * `RESULT_OK` → 提示已启用并收起未启用横幅；`RESULT_CANCELED`（暂不设置 / 返回）→ 静默，不重复打扰。
-     */
-    private val lockSetupLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            _binding?.bannerLock?.visibility = View.GONE
-            toast(R.string.security_lock_enabled)
-        }
     }
 
     private val jurisdictionOptions = listOf(
@@ -124,36 +109,15 @@ class CredentialsFragment : Fragment() {
             return
         }
         viewLifecycleOwner.lifecycleScope.launch {
-            // 「保存前是否已有凭证」作为首次判据：凭证一旦存在即永存，故该条件天然只在首次命中，
-            // 无需新增持久化标记（避免跨包改 AppSettings / 新增设置项）。
-            val hadCredentialsBefore = viewModel.load() != null
             val result = viewModel.save(credentials)
-            toast(if (result.saved) R.string.credentials_saved else R.string.credentials_test_fail)
-            if (result.saved && !hadCredentialsBefore && !viewModel.isAppLockEnabled()) {
-                promptEnableLock()
+            if (!result.saved) {
+                showConnectionFailure(result.error)
+            } else if (result.managementApiOk == true) {
+                toast(R.string.credentials_saved)
+            } else {
+                toast(R.string.credentials_saved_no_bucket)
             }
         }
-    }
-
-    /**
-     * 首次配置完成后引导设置应用锁（原型第 5 屏 `lock-setup`）。
-     *
-     * 文案明示「启用会清空并重建本地缓存」（与安全设置页内联入口同一 [R.string.security_lock_cache_wipe] 口径）；
-     * 「暂不设置」静默返回、之后不再重复打扰（凭证已存在，判据不再命中）。
-     */
-    private fun promptEnableLock() {
-        if (!isAdded || _binding == null) return
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.lock_setup_title)
-            .setMessage(
-                getString(R.string.security_lock_cache_wipe) + "\n\n" +
-                    getString(R.string.lock_setup_intro)
-            )
-            .setNegativeButton(R.string.lock_setup_skip, null)
-            .setPositiveButton(R.string.lock_setup_submit) { _, _ ->
-                lockSetupLauncher.launch(Intent(requireContext(), LockSetupActivity::class.java))
-            }
-            .show()
     }
 
     private fun testConnection() {
@@ -166,8 +130,24 @@ class CredentialsFragment : Fragment() {
             binding.btnTest.isEnabled = false
             val result = viewModel.test(credentials)
             binding.btnTest.isEnabled = true
-            toast(if (result.ok) R.string.credentials_test_ok else R.string.credentials_test_fail)
+            if (result.ok) {
+                toast(R.string.credentials_test_ok)
+            } else {
+                showConnectionFailure(result.error)
+            }
         }
+    }
+
+    /** 展示可定位的连接错误，避免把完整异常消息或签名内容展示给用户。 */
+    private fun showConnectionFailure(error: AppError?) {
+        val titleRes = error?.messageResId?.takeIf { it != 0 } ?: R.string.credentials_test_fail
+        val message = error?.let { ErrorMapper.detailFor(requireContext(), it) }
+            ?: getString(titleRes)
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(titleRes)
+            .setMessage(message)
+            .setPositiveButton(R.string.action_close, null)
+            .show()
     }
 
     private fun confirmClear() {

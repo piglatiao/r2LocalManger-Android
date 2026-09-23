@@ -6,6 +6,7 @@ import com.r2manager.android.core.constants.CacheConstants
 import com.r2manager.android.core.crypto.KeyDerivation
 import com.r2manager.android.core.crypto.SecretCodec
 import com.r2manager.android.data.local.prefs.SettingsStore
+import javax.crypto.Cipher
 
 /**
  * 缓存密钥管理（P3）。
@@ -100,6 +101,9 @@ class KeyManager(
     fun hasBiometricKey(): Boolean =
         !settings.raw().getString(BIOMETRIC_KEY_BLOB, null).isNullOrEmpty()
 
+    /** 为生物识别 Prompt 准备需要授权的解密 Cipher。 */
+    fun prepareBiometricCipher(): Cipher? = biometricKeyStore.createDecryptCipher()
+
     /**
      * 用生物识别绑定的 Keystore **公钥**包裹当前会话密钥并落盘。
      * 应在「设置 / 修改 / 找回密码」成功后调用（此时 [key] 已是新的密码派生密钥）。
@@ -127,10 +131,10 @@ class KeyManager(
      *
      * @return 还原成功返回 true；密文缺失 / 未认证 / 密钥失效返回 false（调用方应回退密码通道）
      */
-    fun unlockWithBiometric(): Boolean {
+    fun unlockWithBiometric(cipher: Cipher): Boolean {
         val wrapped = settings.raw().getString(BIOMETRIC_KEY_BLOB, null)
         if (wrapped.isNullOrEmpty()) return false
-        val decoded = biometricKeyStore.decrypt(wrapped)
+        val decoded = biometricKeyStore.decrypt(wrapped, cipher)
         if (decoded == null || decoded.size != CacheConstants.KEY_LENGTH) {
             decoded?.fill(0)
             // 无法还原（密钥失效 / 数据损坏）→ 清除陈旧绑定，待密码解锁后重建

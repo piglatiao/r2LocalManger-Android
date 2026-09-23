@@ -27,6 +27,7 @@ import com.r2manager.android.ui.common.RecyclerItemDecoration
 import com.r2manager.android.ui.common.ViewModelFactory
 import com.r2manager.android.ui.common.applyStatusBarPadding
 import com.r2manager.android.ui.preview.PreviewActivity
+import com.r2manager.android.ui.main.MainActivity
 import com.r2manager.android.core.util.UriUtils
 import com.r2manager.android.databinding.FragmentBrowserBinding
 import kotlinx.coroutines.launch
@@ -289,7 +290,7 @@ class BrowserFragment : BaseFragment<FragmentBrowserBinding>(),
 
         binding.browserSwipeRefresh.isRefreshing = state.refreshing
         binding.browserMultiselectBar.isVisible = state.isSelectionMode
-        binding.browserFabUpload.isVisible = !state.isSelectionMode
+        binding.browserFabUpload.isVisible = !state.isSelectionMode && !state.unconfigured
         binding.browserMultiselectCount.text =
             getString(R.string.browser_selected_count, state.selectedKeys.size)
         binding.browserMultiselectSelectAll.isVisible = state.selectedKeys.size < state.visibleObjects.size
@@ -302,6 +303,17 @@ class BrowserFragment : BaseFragment<FragmentBrowserBinding>(),
         when {
             state.isLoading && state.objects.isEmpty() -> {
                 stateView.showLoading(getString(R.string.state_loading))
+                binding.browserRecycler.isVisible = false
+            }
+
+            state.unconfigured -> {
+                stateView.showEmpty(
+                    titleRes = R.string.browser_config_required,
+                    descRes = R.string.browser_config_required_desc,
+                    actionRes = R.string.browser_open_settings
+                ) {
+                    (requireActivity() as? MainActivity)?.openSettingsTab()
+                }
                 binding.browserRecycler.isVisible = false
             }
 
@@ -343,16 +355,23 @@ class BrowserFragment : BaseFragment<FragmentBrowserBinding>(),
     }
 
     private fun applyViewMode(mode: BrowserUiState.ViewMode) {
+        val modeChanged = listAdapter.viewMode != mode
+        listAdapter.viewMode = mode
         val desiredSpan = when (mode) {
             BrowserUiState.ViewMode.LIST -> 1
             BrowserUiState.ViewMode.GRID -> resources.getInteger(R.integer.grid_span_portrait)
         }
         val current = binding.browserRecycler.layoutManager
         val currentSpan = (current as? GridLayoutManager)?.spanCount
-        if (mode == BrowserUiState.ViewMode.LIST && current !is LinearLayoutManager) {
+        if (mode == BrowserUiState.ViewMode.LIST &&
+            (current !is LinearLayoutManager || current is GridLayoutManager)
+        ) {
             binding.browserRecycler.layoutManager = LinearLayoutManager(requireContext())
         } else if (mode == BrowserUiState.ViewMode.GRID && currentSpan != desiredSpan) {
             binding.browserRecycler.layoutManager = GridLayoutManager(requireContext(), desiredSpan)
+        }
+        if (modeChanged) {
+            listAdapter.notifyDataSetChanged()
         }
         if (binding.browserRecycler.itemDecorationCount > 0) {
             repeat(binding.browserRecycler.itemDecorationCount) { binding.browserRecycler.removeItemDecorationAt(0) }

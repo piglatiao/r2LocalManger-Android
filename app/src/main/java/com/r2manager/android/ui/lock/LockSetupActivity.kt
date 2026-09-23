@@ -40,7 +40,7 @@ class LockSetupActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // 设备不支持生物识别时隐藏开关
-        val biometricAvailable = BiometricAuthenticator(this).canAuthenticate()
+        val biometricAvailable = BiometricAuthenticator(this).canAuthenticate(withCryptoObject = true)
         if (!biometricAvailable) {
             binding.switchBiometric.isChecked = false
             binding.switchBiometric.visibility = View.GONE

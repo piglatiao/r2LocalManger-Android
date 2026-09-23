@@ -12,7 +12,7 @@ import com.r2manager.android.domain.model.Credentials
 /**
  * R2 凭证配置 ViewModel（P4-B）。
  *
- * 存取与「保存后异步探测管理面」全部复用 P2 [CredentialRepository]；
+ * 存取与「保存后自动列桶」全部复用 P2 [CredentialRepository]；
  * 端点由 Account ID 经 [UrlUtils.buildEndpoint] 派生（与 P2 保存逻辑一致，仅作预览）。
  */
 class CredentialsViewModel(private val container: AppContainer) : ViewModel() {
@@ -22,8 +22,14 @@ class CredentialsViewModel(private val container: AppContainer) : ViewModel() {
     /** 读取已保存凭证。 */
     suspend fun load(): Credentials? = repo.load()
 
-    /** 保存凭证（内部会异步探测管理面）。 */
-    suspend fun save(credentials: Credentials): SaveResult = repo.save(credentials)
+    /** 保存凭证，并刷新设置状态以同步自动选择的首桶。 */
+    suspend fun save(credentials: Credentials): SaveResult {
+        val result = repo.save(credentials)
+        if (result.saved) {
+            container.settingsRepository.refresh()
+        }
+        return result
+    }
 
     /** 连接测试（10s 超时内列一次对象）。 */
     suspend fun test(credentials: Credentials): TestResult = repo.testConnection(credentials)

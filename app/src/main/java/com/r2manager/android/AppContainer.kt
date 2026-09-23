@@ -217,7 +217,6 @@ class AppContainer(private val application: Context) {
             store = credentialStore,
             settings = settingsStore,
             httpClient = httpClient,
-            scope = appScope,
             ioDispatcher = appDispatchers.io
         )
     }
