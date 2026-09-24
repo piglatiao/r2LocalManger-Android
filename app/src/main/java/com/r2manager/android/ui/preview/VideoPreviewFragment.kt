@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 /**
  * 视频预览：framework [android.widget.VideoView] 播放（主理人裁决：一期不引入 media3）。
  *
- * 视频先落地缓存文件再播放；点击封面播放，播放中显示 `MediaController`。
+ * 视频先落地缓存文件；准备完成后默认暂停并显示 `MediaController`。
  */
 class VideoPreviewFragment : BaseFragment<FragmentPreviewVideoBinding>() {
 
@@ -42,8 +42,8 @@ class VideoPreviewFragment : BaseFragment<FragmentPreviewVideoBinding>() {
 
                     is PreviewUiState.Video -> {
                         binding.previewVideoProgress.isVisible = false
+                        binding.previewVideoPlay.isVisible = false
                         binding.previewVideoMessage.isVisible = false
-                        binding.previewVideoPlay.isVisible = true
                         prepare(binding, Uri.fromFile(state.file))
                     }
 
@@ -61,6 +61,10 @@ class VideoPreviewFragment : BaseFragment<FragmentPreviewVideoBinding>() {
         viewModel.open(key, PreviewKind.VIDEO)
     }
 
+    /** 设置播放器数据源，并在准备完成后显示暂停态控制条。
+     * @param binding 当前页面视图绑定
+     * @param uri 本地缓存视频地址
+     */
     private fun prepare(binding: FragmentPreviewVideoBinding, uri: Uri) {
         val controller = MediaController(requireContext())
         controller.setAnchorView(binding.previewVideo)
@@ -68,11 +72,14 @@ class VideoPreviewFragment : BaseFragment<FragmentPreviewVideoBinding>() {
         binding.previewVideo.setVideoURI(uri)
         binding.previewVideo.setOnPreparedListener { mp ->
             mp.isLooping = false
+            binding.previewVideo.pause()
             binding.previewVideoPlay.isVisible = true
             binding.previewVideoPlay.setOnClickListener {
                 binding.previewVideoPlay.isVisible = false
                 binding.previewVideo.start()
+                controller.show(3_000)
             }
+            controller.show(0)
         }
         binding.previewVideo.setOnErrorListener { _, _, _ ->
             binding.previewVideoPlay.isVisible = false

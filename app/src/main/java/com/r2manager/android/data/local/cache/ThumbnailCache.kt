@@ -26,6 +26,17 @@ data class ThumbnailCacheStats(
 interface ThumbnailCache {
     suspend fun get(meta: ThumbnailMeta): ByteArray?
     suspend fun put(meta: ThumbnailMeta, bytes: ByteArray, contentType: String = "image/jpeg"): Boolean
+
+    /** 读取随缩略图索引保存的视频时长。
+     * @param meta 缩略图缓存元信息
+     */
+    suspend fun getVideoDuration(meta: ThumbnailMeta): Long?
+
+    /** 将视频时长写入对应缩略图索引。
+     * @param meta 缩略图缓存元信息
+     * @param durationMs 视频时长（毫秒）
+     */
+    suspend fun putVideoDuration(meta: ThumbnailMeta, durationMs: Long): Boolean
     suspend fun pruneMissingObjects(
         bucket: String,
         prefix: String,
@@ -126,6 +137,26 @@ class ThumbnailCacheImpl(
             )
         )
         deleteFiles(index.evict(MAX_ENTRIES, maxBytes))
+        index.save()
+        true
+    }
+
+    override suspend fun getVideoDuration(meta: ThumbnailMeta): Long? = mutex.withLock {
+        if (!canUseCache()) {
+            return@withLock null
+        }
+        ensureReady()
+        val entry = index.get(CacheKeyFactory.thumbId(meta)) ?: return@withLock null
+        entry.metadata[META_VIDEO_DURATION]?.toLongOrNull()
+    }
+
+    override suspend fun putVideoDuration(meta: ThumbnailMeta, durationMs: Long): Boolean = mutex.withLock {
+        if (!canUseCache() || durationMs < 0L) {
+            return@withLock false
+        }
+        ensureReady()
+        val entry = index.peek(CacheKeyFactory.thumbId(meta)) ?: return@withLock false
+        entry.metadata[META_VIDEO_DURATION] = durationMs.toString()
         index.save()
         true
     }
@@ -235,5 +266,6 @@ class ThumbnailCacheImpl(
         const val META_BUCKET = "bucket"
         const val META_KEY = "key"
         const val META_CONTENT_TYPE = "contentType"
+        const val META_VIDEO_DURATION = "videoDurationMs"
     }
 }

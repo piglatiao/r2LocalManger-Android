@@ -10,6 +10,7 @@ import com.r2manager.android.data.local.cache.CacheKeyFactory
 import com.r2manager.android.domain.model.ObjectInfo
 import com.r2manager.android.domain.model.ThumbnailMeta
 import com.r2manager.android.domain.thumbnail.ThumbnailLoader
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -31,6 +32,7 @@ class ThumbnailRequestManager(
 ) {
 
     private val jobs = HashMap<ImageView, Job>()
+    private val videoDurations = HashMap<String, Long>()
 
     /** 内存缓存：按解码后位图字节估算占用，上限 12MB。 */
     private val memory = object : LruCache<String, ByteArray>(MAX_MEMORY_BYTES) {
@@ -43,31 +45,60 @@ class ThumbnailRequestManager(
      * @param target 目标 ImageView
      * @param bucket 桶名
      * @param info 列表项
+     * @param onDuration 视频时长加载完成回调
      */
-    fun load(target: ImageView, bucket: String, info: ObjectInfo) {
+    fun load(target: ImageView, bucket: String, info: ObjectInfo, onDuration: (Long?) -> Unit = {}) {
         if (info.isFolder) {
+            cancel(target)
             showTypeIcon(target, info)
             return
         }
         val key = CacheKeyFactory.thumbId(thumbnailMeta(bucket, info))
+        val isVideo = FileTypes.kindOf(info.key) == PreviewKind.VIDEO
+        val knownDuration = videoDurations[key]
+        if (isVideo) {
+            onDuration(knownDuration)
+        }
+        cancel(target)
         val cached = memory.get(key)
-        if (cached != null) {
+        if (cached != null && (!isVideo || knownDuration != null)) {
             applyBytes(target, cached)
             return
         }
-        cancel(target)
-        target.setImageDrawable(null)
-        target.setImageResource(typeIconRes(info))
+        if (cached != null) {
+            applyBytes(target, cached)
+        } else {
+            target.setImageDrawable(null)
+            target.setImageResource(typeIconRes(info))
+        }
         jobs[target] = scope.launch {
-            val bytes = runCatching { loader.load(bucket, info) }.getOrNull()
-            if (bytes != null) {
-                memory.put(key, bytes)
-                applyBytes(target, bytes)
-            } else {
+            val result = try {
+                loader.load(bucket, info)
+            } catch (cancel: CancellationException) {
+                throw cancel
+            } catch (_: Throwable) {
+                null
+            }
+            if (result?.durationMs != null) {
+                videoDurations[key] = result.durationMs
+            }
+            if (isVideo) {
+                onDuration(result?.durationMs ?: knownDuration)
+            }
+            if (result?.bytes != null) {
+                memory.put(key, result.bytes)
+                applyBytes(target, result.bytes)
+            } else if (cached == null) {
                 showTypeIcon(target, info)
+            } else {
+                onDuration(knownDuration)
             }
         }
     }
+
+    /** 读取当前进程中已提取的视频时长。 */
+    fun durationMs(bucket: String, info: ObjectInfo): Long? =
+        videoDurations[CacheKeyFactory.thumbId(thumbnailMeta(bucket, info))]
 
     /** 取消某视图的在途请求（应在 `onViewRecycled` 调用）。 */
     fun cancel(target: ImageView) {

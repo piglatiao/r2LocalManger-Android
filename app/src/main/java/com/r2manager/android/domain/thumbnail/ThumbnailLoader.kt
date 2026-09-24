@@ -18,6 +18,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * 缩略图加载器（P3，R-11/R-12）。
@@ -37,10 +38,19 @@ class ThumbnailLoader(
     private val video: VideoFrameExtractor
 ) {
 
+    /** 缩略图与可用的视频总时长。 */
+    data class Result(
+        /** JPEG 缩略图字节。 */
+        val bytes: ByteArray?,
+        /** 视频总时长（毫秒）。 */
+        val durationMs: Long?
+    )
+
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val videoSemaphore = Semaphore(TransferConstants.VIDEO_THUMBNAIL_CONCURRENCY)
     private val inflightMutex = Mutex()
-    private val inflight = HashMap<String, Deferred<ByteArray?>>()
+    private val inflight = HashMap<String, Deferred<Result>>()
+    private val videoDurations = ConcurrentHashMap<String, Long>()
 
     @Volatile
     private var cacheEnabled: Boolean = true
@@ -49,15 +59,19 @@ class ThumbnailLoader(
     private var cacheEnabledCheckedAt: Long = 0L
 
     /**
-     * 加载缩略图。
-     * @return JPEG 字节；不可用（文件夹/超大/缓存关闭/非图非视/失败）返回 null
+     * 加载缩略图和视频时长。
+     * @param bucket 存储桶名称
+     * @param info 文件信息
+     * @return 缩略图字节与可用时长；不可用字段为空
      */
-    suspend fun load(bucket: String, info: ObjectInfo): ByteArray? {
-        if (info.isFolder) return null
-        if (info.size > TransferConstants.THUMBNAIL_SOURCE_MAX_BYTES) return null
+    suspend fun load(bucket: String, info: ObjectInfo): Result {
+        if (info.isFolder) return Result(null, null)
 
         val kind = FileTypes.kindOf(info.key)
-        if (kind != PreviewKind.IMAGE && kind != PreviewKind.VIDEO) return null
+        if (kind != PreviewKind.IMAGE && kind != PreviewKind.VIDEO) return Result(null, null)
+        if (kind == PreviewKind.IMAGE && info.size > TransferConstants.THUMBNAIL_SOURCE_MAX_BYTES) {
+            return Result(null, null)
+        }
 
         val meta = ThumbnailMeta(
             bucket = bucket,
@@ -67,14 +81,21 @@ class ThumbnailLoader(
             etag = info.etag
         )
 
-        cache.get(meta)?.let { return it }
-        if (!isCacheEnabled()) return null
-
         val cacheId = CacheKeyFactory.thumbId(meta)
+        val cached = cache.get(meta)
+        val duration = videoDurations[cacheId] ?: cache.getVideoDuration(meta)?.also {
+            videoDurations[cacheId] = it
+        }
+        if (cached != null && (kind != PreviewKind.VIDEO || duration != null)) {
+            return Result(cached, duration)
+        }
+        if (info.size > TransferConstants.THUMBNAIL_SOURCE_MAX_BYTES) return Result(cached, duration)
+        if (!isCacheEnabled()) return Result(cached, duration)
+
         val existing = inflightMutex.withLock { inflight[cacheId] }
         if (existing != null) return existing.await()
 
-        val deferred = scope.async { produce(meta, kind) }
+        val deferred = scope.async { produce(meta, kind, cached) }
         inflightMutex.withLock { inflight[cacheId] = deferred }
         return try {
             deferred.await()
@@ -83,18 +104,27 @@ class ThumbnailLoader(
         }
     }
 
-    private suspend fun produce(meta: ThumbnailMeta, kind: PreviewKind): ByteArray? = runCatching {
+    private suspend fun produce(meta: ThumbnailMeta, kind: PreviewKind, cached: ByteArray?): Result = runCatching {
         val (stream, _) = repo.openObjectStream(meta.key)
-        val bytes = when (kind) {
-            PreviewKind.IMAGE -> generator.generate(stream, meta.key, meta.size)
-            PreviewKind.VIDEO -> videoSemaphore.withPermit { video.extractFirstFrame(stream) }
-            else -> null
+        val result = when (kind) {
+            PreviewKind.IMAGE -> Result(generator.generate(stream, meta.key, meta.size), null)
+            PreviewKind.VIDEO -> videoSemaphore.withPermit {
+                val videoResult = video.extractFirstFrame(stream)
+                Result(cached ?: videoResult?.jpeg, videoResult?.durationMs)
+            }
+            else -> Result(null, null)
         }
-        if (bytes != null) {
-            cache.put(meta, bytes, "image/jpeg")
+        if (kind == PreviewKind.IMAGE && result.bytes != null) {
+            cache.put(meta, result.bytes, "image/jpeg")
+        } else if (kind == PreviewKind.VIDEO && cached == null && result.bytes != null) {
+            cache.put(meta, result.bytes, "image/jpeg")
         }
-        bytes
-    }.onFailure { Log.w(TAG, "生成缩略图失败: ${meta.key}", it) }.getOrNull()
+        if (kind == PreviewKind.VIDEO && result.durationMs != null) {
+            videoDurations[CacheKeyFactory.thumbId(meta)] = result.durationMs
+            cache.putVideoDuration(meta, result.durationMs)
+        }
+        result
+    }.onFailure { Log.w(TAG, "生成缩略图失败: ${meta.key}", it) }.getOrDefault(Result(cached, null))
 
     private suspend fun isCacheEnabled(): Boolean {
         val now = System.currentTimeMillis()

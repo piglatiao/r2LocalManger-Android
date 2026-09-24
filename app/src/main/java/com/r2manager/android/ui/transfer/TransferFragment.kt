@@ -19,6 +19,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.tabs.TabLayoutMediator
 import com.r2manager.android.R
 import com.r2manager.android.appContainer
+import com.r2manager.android.core.mime.MimeTypes
 import com.r2manager.android.core.util.UrlUtils
 import com.r2manager.android.databinding.FragmentTransferBinding
 import com.r2manager.android.domain.model.TransferStatus
@@ -151,9 +152,11 @@ class TransferFragment : Fragment() {
             toast(R.string.error_file_not_found)
             return
         }
+        val mimeType = resolvedMimeType(uri, task.key)
         val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, "*/*")
+            setDataAndType(uri, mimeType)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            clipData = ClipData.newUri(requireContext().contentResolver, task.key, uri)
         }
         runCatching { startActivity(intent) }
             .onFailure { toast(R.string.error_file_not_found) }
@@ -165,13 +168,28 @@ class TransferFragment : Fragment() {
             toast(R.string.error_file_not_found)
             return
         }
+        val mimeType = resolvedMimeType(uri, task.key)
         val send = Intent(Intent.ACTION_SEND).apply {
-            type = "*/*"
+            type = mimeType
             putExtra(Intent.EXTRA_STREAM, uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            clipData = ClipData.newUri(requireContext().contentResolver, task.key, uri)
         }
         runCatching { startActivity(Intent.createChooser(send, getString(R.string.action_share))) }
             .onFailure { toast(R.string.error_file_not_found) }
+    }
+
+    /** 获取文档提供方的 MIME；未提供时按对象扩展名推断。
+     * @param uri 下载文件的文档 Uri
+     * @param key 对象 key
+     */
+    private fun resolvedMimeType(uri: Uri, key: String): String {
+        val provided = runCatching { requireContext().contentResolver.getType(uri) }.getOrNull()
+            ?.takeIf { it.isNotBlank() && it != "*/*" }
+        val inferred = MimeTypes.resolveContentType(key)
+        return if (provided == null ||
+            (provided == MimeTypes.DEFAULT_CONTENT_TYPE && inferred != MimeTypes.DEFAULT_CONTENT_TYPE)
+        ) inferred else provided
     }
 
     private fun onCopyLink(task: TransferTask) {

@@ -21,12 +21,20 @@ import java.io.InputStream
  */
 class VideoFrameExtractor {
 
+    /** 视频缩略图与媒体总时长。 */
+    data class Result(
+        /** JPEG 缩略图字节。 */
+        val jpeg: ByteArray?,
+        /** 视频总时长（毫秒）。 */
+        val durationMs: Long?
+    )
+
     /**
-     * 抽取视频首帧并压缩为 JPEG。
+     * 抽取视频首帧并读取媒体总时长。
      * @param source 视频字节流（本方法会关闭它）
-     * @return JPEG 字节；失败返回 null
+     * @return 缩略图和时长；读取失败返回 null
      */
-    suspend fun extractFirstFrame(source: InputStream): ByteArray? = withContext(Dispatchers.IO) {
+    suspend fun extractFirstFrame(source: InputStream): Result? = withContext(Dispatchers.IO) {
         val bytes = try {
             source.use { it.readBytes() }
         } catch (t: Throwable) {
@@ -37,8 +45,12 @@ class VideoFrameExtractor {
 
         val retriever = MediaMetadataRetriever()
         var frame: Bitmap? = null
+        var durationMs: Long? = null
         try {
             retriever.setDataSource(ByteArrayMediaDataSource(bytes))
+            durationMs = runCatching {
+                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull()
+            }.getOrNull()
             frame = retriever.getFrameAtTime(0L, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
         } catch (t: Throwable) {
             Log.w(TAG, "视频抽帧失败", t)
@@ -46,14 +58,16 @@ class VideoFrameExtractor {
             runCatching { retriever.release() }
         }
 
-        val bitmap = frame ?: return@withContext null
-        val result = ThumbnailGenerator.compressToJpeg(
-            bitmap,
-            TransferConstants.THUMBNAIL_MAX_EDGE_PX,
-            TransferConstants.THUMBNAIL_JPEG_QUALITY
-        )
-        bitmap.recycle()
-        result
+        val jpeg = frame?.let { bitmap ->
+            val compressed = ThumbnailGenerator.compressToJpeg(
+                bitmap,
+                TransferConstants.THUMBNAIL_MAX_EDGE_PX,
+                TransferConstants.THUMBNAIL_JPEG_QUALITY
+            )
+            bitmap.recycle()
+            compressed
+        }
+        Result(jpeg, durationMs)
     }
 
     /** 把内存字节包装成可随机读取的 [MediaDataSource]。 */

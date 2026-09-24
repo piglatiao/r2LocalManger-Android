@@ -401,7 +401,9 @@ class BrowserFragment : BaseFragment<FragmentBrowserBinding>(),
             is BrowserEvent.Message -> snackbar(event.resId)
             is BrowserEvent.MessageText -> snackbar(event.text)
             is BrowserEvent.OpenPreview -> {
-                startActivity(PreviewActivity.intent(requireContext(), event.key, event.kind))
+                startActivity(
+                    PreviewActivity.intent(requireContext(), event.key, event.kind, viewModel.state.value.bucket)
+                )
             }
 
             is BrowserEvent.OpenUrlSheet -> {

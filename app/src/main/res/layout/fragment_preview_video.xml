@@ -12,13 +12,16 @@
         android:layout_height="match_parent"
         android:layout_gravity="center" />
 
-    <com.google.android.material.button.MaterialButton
+    <ImageButton
         android:id="@+id/preview_video_play"
-        style="@style/Widget.R2Manager.Button.Brand"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         android:layout_gravity="center"
-        android:text="@string/action_open"
+        android:background="@drawable/bg_preview_video_play"
+        android:contentDescription="@string/preview_video_play"
+        android:padding="16dp"
+        android:src="@drawable/ic_play"
+        android:tint="@color/white"
         android:visibility="gone" />
 
     <ProgressBar

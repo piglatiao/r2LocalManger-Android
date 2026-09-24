@@ -34,6 +34,19 @@
             android:src="@drawable/ic_check"
             android:visibility="gone"
             android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/grid_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/space_1"
+            android:background="@drawable/bg_video_duration"
+            android:paddingHorizontal="@dimen/space_1"
+            android:paddingVertical="2dp"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            android:visibility="gone" />
     </FrameLayout>
 
     <TextView

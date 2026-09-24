@@ -87,6 +87,7 @@
     <string name="preview_label_url">公开链接</string>
     <string name="preview_image_failed">图片解码失败，请下载后查看</string>
     <string name="preview_video_failed">视频无法播放，请下载后查看</string>
+    <string name="preview_video_play">播放视频</string>
     <string name="preview_unknown_type">未知类型</string>
     <string name="preview_no_public_url">该文件暂无公开链接</string>
     <string name="preview_download_queued">已加入下载队列</string>

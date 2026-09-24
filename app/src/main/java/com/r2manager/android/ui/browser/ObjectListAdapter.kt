@@ -5,11 +5,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.r2manager.android.R
 import com.r2manager.android.core.util.ByteFormat
 import com.r2manager.android.core.util.TimeFormat
+import com.r2manager.android.core.mime.FileTypes
+import com.r2manager.android.core.mime.PreviewKind
 import com.r2manager.android.databinding.ItemObjectBinding
 import com.r2manager.android.databinding.ItemObjectGridBinding
 import com.r2manager.android.domain.model.ObjectInfo
@@ -93,8 +96,10 @@ class ObjectListAdapter(
             root.isActivated = selectionMode && selected
             root.setOnClickListener { listener.onClick(info) }
             root.setOnLongClickListener { listener.onLongClick(info) }
-            thumbnails.load(thumb, bucket, info)
+            thumbnails.load(thumb, bucket, info) { onVideoDurationChanged(info, it) }
         }
+
+        protected open fun onVideoDurationChanged(info: ObjectInfo, durationMs: Long?) = Unit
     }
 
     /** 列表视图。 */
@@ -104,10 +109,14 @@ class ObjectListAdapter(
         override fun bind(info: ObjectInfo, selected: Boolean) {
             bindCommon(binding.root, info, selected)
             binding.itemName.text = info.name
-            binding.itemMeta.text = subtitleOf(info)
+            binding.itemMeta.text = subtitleOf(info, thumbnails.durationMs(bucket, info))
             binding.itemSelected.visibility =
                 if (selectionMode && selected) View.VISIBLE else View.GONE
             binding.itemMore.setOnClickListener { listener.onMoreClick(info, binding.itemMore) }
+        }
+
+        override fun onVideoDurationChanged(info: ObjectInfo, durationMs: Long?) {
+            binding.itemMeta.text = subtitleOf(info, durationMs)
         }
     }
 
@@ -118,8 +127,15 @@ class ObjectListAdapter(
         override fun bind(info: ObjectInfo, selected: Boolean) {
             bindCommon(binding.root, info, selected)
             binding.gridName.text = info.name
+            val isVideo = FileTypes.kindOf(info.key) == PreviewKind.VIDEO
+            binding.gridDuration.isVisible = isVideo
+            binding.gridDuration.text = formatDuration(thumbnails.durationMs(bucket, info))
             binding.gridSelected.visibility =
                 if (selectionMode && selected) View.VISIBLE else View.GONE
+        }
+
+        override fun onVideoDurationChanged(info: ObjectInfo, durationMs: Long?) {
+            binding.gridDuration.text = formatDuration(durationMs)
         }
     }
 
@@ -128,13 +144,28 @@ class ObjectListAdapter(
         const val TYPE_GRID = 1
 
         /** 列表副标题：大小 · 时间（文件夹显示「文件夹」）。 */
-        fun subtitleOf(info: ObjectInfo): String {
+        fun subtitleOf(info: ObjectInfo, durationMs: Long?): String {
             if (info.isFolder) {
                 return "文件夹"
             }
             val size = ByteFormat.size(info.size)
             val time = TimeFormat.display(info.lastModifiedIso)
-            return if (time.isEmpty()) size else "$size · $time"
+            val duration = if (FileTypes.kindOf(info.key) == PreviewKind.VIDEO) formatDuration(durationMs) else ""
+            val details = listOf(duration, size, time).filter { it.isNotEmpty() }
+            return details.joinToString(" · ")
+        }
+
+        fun formatDuration(durationMs: Long?): String {
+            if (durationMs == null || durationMs < 0L) return "--:--"
+            val totalSeconds = durationMs / 1000L
+            val seconds = totalSeconds % 60L
+            val minutes = (totalSeconds / 60L) % 60L
+            val hours = totalSeconds / 3600L
+            return if (hours > 0L) {
+                String.format(java.util.Locale.ROOT, "%d:%02d:%02d", hours, minutes, seconds)
+            } else {
+                String.format(java.util.Locale.ROOT, "%02d:%02d", totalSeconds / 60L, seconds)
+            }
         }
     }
 }
