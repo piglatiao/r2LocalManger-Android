@@ -5,7 +5,7 @@
 -->
 <resources>
 
-    <string name="app_name">R2 存储管理器</string>
+    <string name="app_name">芸藏</string>
 
     <!-- ===== 通用按钮 ===== -->
     <string name="action_confirm">确认</string>
