@@ -38,6 +38,7 @@
 
     <string name="toast_copied">已复制</string>
     <string name="toast_saved">已保存</string>
+    <string name="toast_press_back_again_to_exit">再按一次返回退出应用</string>
 
     <!-- ===== 传输通用 ===== -->
     <string name="transfer_progress_template">正在上传 %1$s… %2$d%% (%3$s/%4$s)</string>

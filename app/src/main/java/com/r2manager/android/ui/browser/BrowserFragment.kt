@@ -136,7 +136,13 @@ class BrowserFragment : BaseFragment<FragmentBrowserBinding>(),
     private fun setupToolbar() {
         binding.browserToolbar.applyStatusBarPadding()
         binding.browserToolbar.setNavigationIcon(R.drawable.ic_swap)
-        binding.browserToolbar.setNavigationOnClickListener { viewModel.requestBucketSwitch() }
+        binding.browserToolbar.setNavigationOnClickListener {
+            if (viewModel.state.value.prefix.isNotBlank()) {
+                viewModel.navigateUp()
+            } else {
+                viewModel.requestBucketSwitch()
+            }
+        }
         binding.browserToolbar.inflateMenu(R.menu.menu_browser)
         binding.browserToolbar.menu.add(0, MENU_SEARCH, 0, R.string.action_search).apply {
             setIcon(R.drawable.ic_search)
@@ -199,6 +205,7 @@ class BrowserFragment : BaseFragment<FragmentBrowserBinding>(),
             }
         })
         applyViewMode(BrowserUiState.ViewMode.LIST)
+        binding.browserRecycler.itemAnimator = null
         binding.browserRecycler.adapter = listAdapter
         binding.browserRecycler.setHasFixedSize(true)
         binding.browserRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -244,15 +251,18 @@ class BrowserFragment : BaseFragment<FragmentBrowserBinding>(),
             override fun handleOnBackPressed() {
                 if (viewModel.state.value.isSelectionMode) {
                     viewModel.clearSelection()
-                } else if (!binding.browserSearchBar.isVisible) {
-                    // 搜索行未展开：交给系统返回
+                } else if (binding.browserSearchBar.isVisible &&
+                    binding.browserSearchInput.text?.isNotEmpty() == true
+                ) {
+                    binding.browserSearchInput.setText("")
+                } else if (binding.browserSearchBar.isVisible) {
+                    toggleSearch(show = false)
+                } else if (viewModel.navigateUp()) {
+                    Unit
+                } else {
                     isEnabled = false
                     requireActivity().onBackPressedDispatcher.onBackPressed()
                     isEnabled = true
-                } else if (binding.browserSearchInput.text?.isNotEmpty() == true) {
-                    binding.browserSearchInput.setText("")
-                } else {
-                    toggleSearch(show = false)
                 }
             }
         })
@@ -269,6 +279,11 @@ class BrowserFragment : BaseFragment<FragmentBrowserBinding>(),
     private fun render(state: BrowserUiState) {
         // 标题 = 桶名；面包屑
         binding.browserToolbar.title = state.bucket.ifBlank { getString(R.string.app_name) }
+        val nested = state.prefix.isNotBlank()
+        binding.browserToolbar.setNavigationIcon(if (nested) R.drawable.ic_back else R.drawable.ic_swap)
+        binding.browserToolbar.setNavigationContentDescription(
+            if (nested) R.string.action_back else R.string.browser_switch_bucket
+        )
         breadcrumbAdapter.submit(state.bucket, state.prefix)
 
         // 活动筛选 / 搜索指示 Chip
@@ -284,9 +299,7 @@ class BrowserFragment : BaseFragment<FragmentBrowserBinding>(),
         listAdapter.selectionMode = state.isSelectionMode
         listAdapter.selectedKeys = state.selectedKeys
         applyViewMode(state.viewMode)
-        listAdapter.submitList(state.visibleObjects) {
-            binding.browserRecycler.post { listAdapter.notifyDataSetChanged() }
-        }
+        listAdapter.submitList(state.visibleObjects)
 
         binding.browserSwipeRefresh.isRefreshing = state.refreshing
         binding.browserMultiselectBar.isVisible = state.isSelectionMode

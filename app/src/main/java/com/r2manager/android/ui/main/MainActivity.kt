@@ -3,8 +3,11 @@ package com.r2manager.android.ui.main
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.SystemClock
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -32,6 +35,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var pagerAdapter: MainPagerAdapter
     private lateinit var navItems: List<NavItem>
+    private var lastBackPressedAt = 0L
 
     private val viewModel: MainViewModel by viewModels {
         ViewModelFactory.of(appContainer()) { MainViewModel(appContainer()) }
@@ -71,6 +75,23 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.bottomNav.applyNavigationBarPadding()
+
+        // 根页面连续两次返回才退出应用。
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val now = SystemClock.elapsedRealtime()
+                if (lastBackPressedAt != 0L && now - lastBackPressedAt <= BACK_PRESS_INTERVAL_MS) {
+                    finish()
+                } else {
+                    lastBackPressedAt = now
+                    Toast.makeText(
+                        this@MainActivity,
+                        R.string.toast_press_back_again_to_exit,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        })
 
         // 冷启动直达：统一解析入口 extra（传输 > 设置），无直达请求时落默认「文件」页。
         selectTab(resolveEntryTab(intent) ?: MainTab.FILES)
@@ -152,6 +173,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
+        private const val BACK_PRESS_INTERVAL_MS = 2_000L
+
         /**
          * 构造打开主界面的 Intent。
          *
